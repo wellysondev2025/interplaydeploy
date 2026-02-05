@@ -1,7 +1,8 @@
 import axios from "axios";
 
+// Usa variável de ambiente para o baseURL
 const api = axios.create({
-  baseURL: "http://localhost:8000/api/",
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 // Adiciona token automaticamente
