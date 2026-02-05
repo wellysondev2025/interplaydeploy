@@ -1,0 +1,10 @@
+<svg width="400" height="250" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="250" rx="16" fill="#F1F3F5"></rect>
+
+  <circle cx="200" cy="100" r="40" fill="#CED4DA"></circle>
+  <path d="M120 190C120 150 280 150 280 190" fill="#CED4DA"></path>
+
+  <text x="200" y="220" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#868E96">
+    Sem foto
+  </text>
+</svg>
