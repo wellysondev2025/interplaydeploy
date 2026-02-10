@@ -1,21 +1,37 @@
 from django.urls import path
 
-from core.views.game import (
+from core.views.game.patients import (
     PatientCreateView,
     PatientGetByHashView,
-    SessionCreateView,
-    SessionFinalizeView,
-    ActivityCreateView,
     ProfessionalValidateView,
 )
 
-from core.views.painel import (
+from core.views.game.sessions import (
+    SessionCreateView,
+    SessionFinalizeView,
+)
+
+from core.views.game.activities import (
+    ActivityCreateView
+)
+
+from core.views.painel.patients import (
+    PatientListView
+)
+
+from core.views.painel.dashboardview import (
+    DashboardView
+)
+
+from core.views.painel.description import (
+    DescriptionUpdateView
+)
+
+from core.views.painel.professionals import (
     ProfessionalListCreateView,
     ProfessionalRetrieveUpdateDestroyView,
-    PatientListView,
-    DescriptionUpdateView,
-    DashboardView,
 )
+
 
 urlpatterns = [
     # 🎮 GAME

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import bgImage from "../assets/bg.jpg";
 import logoLogin from "../assets/logologin.svg";
 import api from "../services/api";
@@ -16,10 +15,10 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/token/", {
+      const response = await api.post("token/", {
         email,
         password,
-      });
+      })
 
       const { access, refresh } = response.data;
 
@@ -28,7 +27,7 @@ export default function Login() {
       localStorage.setItem("refresh", refresh);
 
       // buscar info do usuário logado
-      const me = await axios.get("http://localhost:8000/api/users/me/", {
+      const me = await api.get("users/me/", {
         headers: {
           Authorization: `Bearer ${access}`,
         },

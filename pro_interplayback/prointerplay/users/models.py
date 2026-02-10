@@ -7,6 +7,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("O email é obrigatório")
+
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -18,19 +19,21 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("admin", True)
-        extra_fields.setdefault("super_user", True)
+
+        return self.create_user(email, password, **extra_fields)
+
 
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     blocked = models.BooleanField(default=False)
-    super_user = models.BooleanField(default=False)
+
+    # papel de negócio
     admin = models.BooleanField(default=False)
 
-    
-
+    # django
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -43,3 +46,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
