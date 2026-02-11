@@ -97,7 +97,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # -----------------------------
 # Banco de dados (Render Postgres ou fallback SQLite)
 # -----------------------------
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = (
+    os.getenv("DATABASE_URL")
+    if ENV == "production"
+    else None
+)
 
 if DATABASE_URL:
     DATABASES = {
