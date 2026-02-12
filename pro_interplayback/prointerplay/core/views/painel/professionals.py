@@ -20,6 +20,21 @@ class ProfessionalListCreateView(generics.ListCreateAPIView):
             return ProfessionalCreateSerializer
         return ProfessionalSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            prof = serializer.save()
+            return Response(
+                {"success": True, "professional": ProfessionalSerializer(prof).data},
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            # ⚡ Aqui devolvemos os erros detalhados em JSON
+            return Response(
+                {"success": False, "errors": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 class ProfessionalRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     """
