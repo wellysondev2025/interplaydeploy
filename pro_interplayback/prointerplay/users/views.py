@@ -21,7 +21,7 @@ class MeView(APIView):
             "id": user.id,
             "email": user.email,
             "name": user.name,
-            "admin": user.admin,
+            "admin": user.is_staff,          # corrigido
             "is_superuser": user.is_superuser,
         })
 
