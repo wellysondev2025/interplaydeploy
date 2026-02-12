@@ -54,12 +54,17 @@ class DashboardView(APIView):
 
         data = {
             "total_patients": Patient.objects.filter(professional=professional).count(),
-            "total_sessions": Session.objects.filter(professional=professional).count(),
+            "total_sessions": Session.objects.filter(
+                patient__professional=professional
+            ).count(),
             "sessions_by_type": list(
-                Session.objects.filter(professional=professional)
+                Session.objects.filter(
+                    patient__professional=professional
+                )
                 .values("session_type")
                 .annotate(total=Count("id"))
             ),
         }
 
         return Response(data)
+
