@@ -37,7 +37,7 @@ class PatientListView(APIView):
         # 🔥 OTIMIZAÇÃO DE QUERY
         patients = patients.select_related("professional").prefetch_related(
             Prefetch(
-                "session_set",
+                "sessions",  # CORRIGIDO (antes era session_set)
                 queryset=Session.objects.prefetch_related(
                     Prefetch(
                         "activities",
@@ -52,7 +52,7 @@ class PatientListView(APIView):
         for patient in patients:
             sessions_list = []
 
-            for session in patient.session_set.all():
+            for session in patient.sessions.all():  # CORRIGIDO (antes era session_set)
                 activities_list = []
 
                 for activity in session.activities.all():
