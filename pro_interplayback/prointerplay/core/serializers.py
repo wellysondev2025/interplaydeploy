@@ -66,7 +66,8 @@ class ProfessionalCreateSerializer(serializers.ModelSerializer):
             email=email,
             password=password,
             name=validated_data["name"],
-            admin=False
+            is_staff=False,      # garante que não é staff
+            is_superuser=False   # garante que não é superuser
         )
 
         # cria o professional

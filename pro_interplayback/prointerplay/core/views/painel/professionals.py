@@ -8,6 +8,10 @@ from core.permissions import (
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
+from rest_framework.response import Response
+from rest_framework import status
+import traceback
+
 
 @method_decorator(csrf_exempt, name='dispatch')  # ⚡ Ignora CSRF temporariamente para Postman
 class ProfessionalListCreateView(generics.ListCreateAPIView):
@@ -22,21 +26,22 @@ class ProfessionalListCreateView(generics.ListCreateAPIView):
         if self.request.method == "POST":
             return ProfessionalCreateSerializer
         return ProfessionalSerializer
-
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-
         try:
-            serializer.is_valid(raise_exception=True)  # ⚡ Vai levantar ValidationError se algo estiver errado
+            serializer.is_valid(raise_exception=True)
             prof = serializer.save()
+            print("Professional criado:", prof)
             return Response(
                 {"success": True, "professional": ProfessionalSerializer(prof).data},
                 status=status.HTTP_201_CREATED
             )
         except Exception as e:
-            # 🔥 Retorna erros detalhados sem quebrar a view
+            traceback_str = traceback.format_exc()
+            print("ERRO criando professional:", traceback_str)
             return Response(
-                {"success": False, "errors": str(e)},
+                {"success": False, "error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
