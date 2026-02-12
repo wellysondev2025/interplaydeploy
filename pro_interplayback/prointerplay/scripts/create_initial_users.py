@@ -8,9 +8,9 @@ from users.models import User
 from core.models import Professional
 
 # ----- SuperUser -----
-super_email = "admin@interplay.com"
+super_email = "welladmin@interplay.com"
 super_password = "123456"
-super_name = "Admin"
+super_name = "Well Admin"
 
 if not User.objects.filter(email=super_email).exists():
     User.objects.create_superuser(
@@ -23,12 +23,12 @@ else:
     print(f"SuperUser já existe: {super_email}")
 
 # ----- Professional inicial -----
-prof_email = "interadmin@interplay.com"
+prof_email = "wellinteradmin@interplay.com"
 prof_password = "123456"
-prof_code = "PROF999"
-prof_cpf = "12345633901"
-prof_name = "Prof S8per"
-prof_address = "Rua Elo, 123"
+prof_code = "PROF888"
+prof_cpf = "12377633901"
+prof_name = "Prof Well Admin"
+prof_address = "Rua antonio, 123"
 
 if not User.objects.filter(email=prof_email).exists():
     # cria user normal
