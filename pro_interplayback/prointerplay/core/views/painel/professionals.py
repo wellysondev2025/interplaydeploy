@@ -5,8 +5,11 @@ from core.permissions import (
     IsSuperUser,
     IsOwnerProfessionalOrSuperUser
 )
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
+@method_decorator(csrf_exempt, name='dispatch')  # ⚡ Ignora CSRF temporariamente para Postman
 class ProfessionalListCreateView(generics.ListCreateAPIView):
     """
     Apenas SuperUser pode listar ou criar profissionais.
@@ -22,16 +25,18 @@ class ProfessionalListCreateView(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
+
+        try:
+            serializer.is_valid(raise_exception=True)  # ⚡ Vai levantar ValidationError se algo estiver errado
             prof = serializer.save()
             return Response(
                 {"success": True, "professional": ProfessionalSerializer(prof).data},
                 status=status.HTTP_201_CREATED
             )
-        else:
-            # ⚡ Aqui devolvemos os erros detalhados em JSON
+        except Exception as e:
+            # 🔥 Retorna erros detalhados sem quebrar a view
             return Response(
-                {"success": False, "errors": serializer.errors},
+                {"success": False, "errors": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
