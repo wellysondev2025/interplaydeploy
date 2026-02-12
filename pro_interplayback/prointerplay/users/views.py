@@ -22,7 +22,7 @@ class MeView(APIView):
             "email": user.email,
             "name": user.name,
             "admin": user.admin,
-            "super_user": user.super_user,
+            "is_superuser": user.is_superuser,
         })
 
 class UserViewSet(viewsets.ModelViewSet):

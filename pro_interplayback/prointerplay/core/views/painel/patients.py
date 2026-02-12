@@ -1,45 +1,62 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from django.db.models import Prefetch
 
 from core.models import Patient, Session, Activity, Description
-from core.permissions import IsProfessionalOrAdmin
 
 
 class PatientListView(APIView):
     """
-    Retorna todos os pacientes do profissional logado.
-    Superuser vê todos os pacientes.
-    Cada paciente traz suas sessões e atividades.
+    Lista pacientes com sessões e atividades.
+
+    SuperUser:
+        - Vê todos os pacientes.
+
+    Professional:
+        - Vê apenas seus próprios pacientes.
     """
-    permission_classes = [IsProfessionalOrAdmin]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
 
-        if user.is_superuser or user.admin:
+        if user.is_superuser:
             patients = Patient.objects.all()
+        elif hasattr(user, "professional_profile"):
+            patients = Patient.objects.filter(
+                professional=user.professional_profile
+            )
         else:
-            professional = user.professional_profile
-            patients = Patient.objects.filter(professional=professional)
+            return Response(
+                {"detail": "Sem permissão"},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-
+        # 🔥 OTIMIZAÇÃO DE QUERY
+        patients = patients.select_related("professional").prefetch_related(
+            Prefetch(
+                "session_set",
+                queryset=Session.objects.prefetch_related(
+                    Prefetch(
+                        "activities",
+                        queryset=Activity.objects.prefetch_related("description")
+                    )
+                ).order_by("-start_date")
+            )
+        )
 
         result = []
 
         for patient in patients:
-            sessions = Session.objects.filter(
-                patient=patient
-            ).order_by("-start_date")
-
             sessions_list = []
 
-            for session in sessions:
-                activities = Activity.objects.filter(session=session)
-
+            for session in patient.session_set.all():
                 activities_list = []
-                for activity in activities:
-                    description = Description.objects.filter(activity=activity).first()
+
+                for activity in session.activities.all():
+                    description = getattr(activity, "description", None)
 
                     activities_list.append({
                         "id": activity.id,
@@ -72,7 +89,7 @@ class PatientListView(APIView):
                     "code": patient.professional.code,
                     "cpf": patient.professional.cpf,
                     "address": patient.professional.address,
-                },                
+                },
                 "sessions": sessions_list
             })
 
