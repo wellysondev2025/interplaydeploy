@@ -15,7 +15,7 @@ export default function Professionals() {
   const { user, loading: loadingUser } = useUser();
 
   useEffect(() => {
-    if (user?.super_user) loadProfessionals();
+    if (user?.is_superuser) loadProfessionals();
     else setLoadingProfessionals(false);
   }, [user]);
 
@@ -63,7 +63,7 @@ export default function Professionals() {
     );
   }
 
-  if (!user?.super_user) {
+  if (!user?.is_superuser) {
     return (
       <DashboardLayout title="Profissionais">
         <p className="p-6 text-gray-500">
@@ -129,7 +129,7 @@ export default function Professionals() {
           professionals={professionals}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          canEdit={user.super_user}
+          canEdit={user.is_superuser}
         />
 
         {/* Modal */}
