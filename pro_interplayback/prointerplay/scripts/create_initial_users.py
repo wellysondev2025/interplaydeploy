@@ -1,5 +1,11 @@
 import os
+import sys
 import django
+
+# ------------------------------
+# Garantir que o Python encontre o módulo backend
+# ------------------------------
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 django.setup()
@@ -7,8 +13,10 @@ django.setup()
 from users.models import User
 from core.models import Professional
 
-# ----- SuperUser -----
-super_email = "welladmin@interplay.com"
+# ------------------------------
+# SuperUser
+# ------------------------------
+super_email = "novoadmin@interplay.com"
 super_password = "123456"
 super_name = "Well Admin"
 
@@ -22,23 +30,26 @@ if not User.objects.filter(email=super_email).exists():
 else:
     print(f"SuperUser já existe: {super_email}")
 
-# ----- Professional inicial -----
+# ------------------------------
+# Professional inicial
+# ------------------------------
 prof_email = "wellinteradmin@interplay.com"
 prof_password = "123456"
 prof_code = "PROF888"
 prof_cpf = "12377633901"
 prof_name = "Prof Well Admin"
-prof_address = "Rua antonio, 123"
+prof_address = "Rua Antonio, 123"
 
 if not User.objects.filter(email=prof_email).exists():
-    # cria user normal
+    # cria user normal (sem campo 'admin')
     user = User.objects.create_user(
         email=prof_email,
         password=prof_password,
         name=prof_name,
-        admin=False
+        is_staff=False,      # garante que não é staff
+        is_superuser=False   # garante que não é superuser
     )
-    # cria professional
+    # cria professional vinculado
     Professional.objects.create(
         user=user,
         code=prof_code,
