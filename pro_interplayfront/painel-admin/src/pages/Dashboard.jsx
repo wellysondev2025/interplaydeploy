@@ -32,8 +32,13 @@ export default function Dashboard() {
     api.get("painel/dashboard/")
       .then((res) => setData(res.data))
       .catch((err) => {
-        console.error("Erro dashboard", err);
-        setData({}); // garante que data nunca será null
+        if (err.response?.status === 401) {
+          localStorage.clear();
+          window.location.href = "/";
+        } else {
+          console.error("Erro dashboard", err);
+          setData({});
+        }
       });
   }, []);
 
