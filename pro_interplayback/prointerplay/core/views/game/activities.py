@@ -18,13 +18,12 @@ class ActivityCreateView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        print("REQUEST DATA:", request.data)
         session_hash = request.data.get('session_hash')
         cod_activity = request.data.get('cod_activity')
         duration = request.data.get('duration')
         image_base64 = request.data.get('image', '')
 
-        if not all([session_hash, cod_activity, duration]):
+        if session_hash is None or cod_activity is None or duration is None:
             return Response({'success': False, 'msg': 'Dados incompletos'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
