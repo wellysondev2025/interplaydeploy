@@ -18,6 +18,7 @@ class ActivityCreateView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        print("REQUEST DATA:", request.data)
         session_hash = request.data.get('session_hash')
         cod_activity = request.data.get('cod_activity')
         duration = request.data.get('duration')
