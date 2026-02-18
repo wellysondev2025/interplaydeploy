@@ -3,9 +3,12 @@ import { useState } from "react";
 import bgImage from "../assets/bg.jpg";
 import logoLogin from "../assets/logologin.svg";
 import api from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
+
 
 export default function Login() {
-  const navigate = useNavigate(); // ✅ Hook no topo
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,10 +28,6 @@ export default function Login() {
 
       const { access, refresh } = response.data;
 
-      // Salvar tokens
-      localStorage.setItem("access", access);
-      localStorage.setItem("refresh", refresh);
-
       // Buscar usuário logado
       const me = await api.get("users/me/", {
         headers: {
@@ -36,10 +35,12 @@ export default function Login() {
         },
       });
 
-      localStorage.setItem("user", JSON.stringify(me.data));
+      // usa o contexto agora
+      login(me.data, access, refresh);
 
       // Redirecionar
       navigate("/dashboard");
+
 
     } catch (err) {
       setError("Email ou senha inválidos.");

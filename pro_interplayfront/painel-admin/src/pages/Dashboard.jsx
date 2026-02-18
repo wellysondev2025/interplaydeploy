@@ -6,19 +6,9 @@ import DashboardLayout from "../layouts/DashboardLayout";
    COMPONENTE KPI CARD
 ===================== */
 const KpiCard = ({ title, value }) => (
-  <div className="relative bg-white rounded-xl shadow-md p-5 overflow-hidden">
-    {/* Gradiente diagonal */}
-    <div
-      className="absolute top-0 right-0 h-full w-1/5"
-      style={{
-        background:
-          "linear-gradient(135deg, #3B0A45 0%, #6A1B6E 40%, #C04A7D 75%, #FFAAAA 110%)",
-        clipPath: "polygon(40% 0, 100% 0, 100% 100%, 0 100%)",
-        opacity: 0.9,
-      }}
-    />
-    <p className="text-xs text-gray-500 relative z-10">{title}</p>
-    <p className="text-2xl font-semibold text-gray-800 mt-2 relative z-10">{value}</p>
+  <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6 border border-gray-100">
+    <p className="text-sm text-gray-500">{title}</p>
+    <p className="text-3xl font-bold text-gray-800 mt-2">{value}</p>
   </div>
 );
 
@@ -34,7 +24,7 @@ export default function Dashboard() {
       .catch((err) => {
         if (err.response?.status === 401) {
           localStorage.clear();
-          window.location.href = "/";
+          window.location.href = "/login";
         } else {
           console.error("Erro dashboard", err);
           setData({});
@@ -45,14 +35,14 @@ export default function Dashboard() {
   if (!data) {
     return (
       <DashboardLayout title="Dashboard">
-        <p className="text-gray-500">Carregando dados...</p>
+        <div className="animate-pulse space-y-4">
+          <div className="h-24 bg-gray-200 rounded-xl"></div>
+          <div className="h-64 bg-gray-200 rounded-xl"></div>
+        </div>
       </DashboardLayout>
     );
   }
 
-  // =====================
-  // FALLBACKS
-  // =====================
   const patientsCount = data.patients_count || 0;
   const sessionsCount = data.sessions_count || 0;
   const activitiesCount = data.activities_count || 0;
@@ -62,6 +52,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout title="Dashboard">
+      
       {/* =====================
           KPIs
       ===================== */}
@@ -75,27 +66,34 @@ export default function Dashboard() {
       {/* =====================
           SESSÕES POR MÊS
       ===================== */}
-      <div className="mt-10 bg-white rounded-xl shadow-md p-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">
+      <div className="mt-12 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 mb-6">
           Sessões nos últimos meses
         </h3>
 
-        <div className="flex items-end gap-4 h-40">
+        <div className="flex items-end gap-6 h-48">
           {sessionsByMonth.length > 0 ? (
             sessionsByMonth.map((item) => (
               <div key={item.month} className="flex flex-col items-center gap-2">
                 <div
-                  className="w-8 rounded-md"
+                  className="w-10 rounded-lg transition-all duration-300"
                   style={{
-                    height: `${item.total * 12}px`,
-                    background: "linear-gradient(180deg, #6A1B6E, #FFAAAA)",
+                    height: `${item.total * 14}px`,
+                    background:
+                      "linear-gradient(180deg, #6A1B6E 0%, #C04A7D 60%, #FFAAAA 100%)",
                   }}
                 />
-                <span className="text-[10px] text-gray-500">{item.month}</span>
+                <span className="text-xs text-gray-500">
+                  {new Date(item.month).toLocaleDateString("pt-BR", {
+                    month: "short",
+                  })}
+                </span>
               </div>
             ))
           ) : (
-            <p className="text-gray-400 text-xs mt-2">Nenhuma sessão registrada</p>
+            <div className="text-center w-full text-gray-400 text-sm">
+              Nenhuma sessão registrada ainda.
+            </div>
           )}
         </div>
       </div>
@@ -103,34 +101,50 @@ export default function Dashboard() {
       {/* =====================
           ÚLTIMAS SESSÕES
       ===================== */}
-      <div className="mt-10 bg-white rounded-xl shadow-md p-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">Últimas sessões</h3>
+      <div className="mt-12 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 mb-6">
+          Últimas sessões
+        </h3>
 
         {lastSessions.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {lastSessions.map((session) => (
               <div
                 key={session.id}
-                className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 hover:bg-gray-100 transition"
+                className="flex items-center justify-between bg-gray-50 rounded-xl px-6 py-4 hover:bg-gray-100 transition-all duration-200"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-800">{session.patient_name}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(session.start_date).toLocaleDateString()} • {session.session_type || "Sessão"}
+                  <p className="text-base font-semibold text-gray-800">
+                    {session.patient_name}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {new Date(session.start_date).toLocaleDateString()} •{" "}
+                    {session.session_type || "Sessão"}
                   </p>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-sm text-gray-700">{session.activities_count || 0} atividades</p>
-                  <p className={`text-xs ${session.finally_session ? "text-green-600" : "text-yellow-600"}`}>
-                    {session.finally_session ? "Finalizada" : "Em andamento"}
+                  <p className="text-sm font-medium text-gray-700">
+                    {session.activities_count || 0} atividades
                   </p>
+
+                  <span
+                    className={`inline-block mt-1 px-3 py-1 text-xs rounded-full font-medium ${
+                      session.finally_session
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {session.finally_session ? "Finalizada" : "Em andamento"}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-400 text-sm">Nenhuma sessão registrada</p>
+          <div className="text-center text-gray-400 text-sm">
+            Nenhuma sessão registrada ainda.
+          </div>
         )}
       </div>
     </DashboardLayout>

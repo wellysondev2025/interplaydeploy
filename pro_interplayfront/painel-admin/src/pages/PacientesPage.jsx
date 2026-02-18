@@ -10,12 +10,12 @@ const ActionButton = ({ children, onClick }) => (
   <button
     onClick={onClick}
     className="
-      px-3 py-1
-      text-xs font-medium
-      rounded-md
-      bg-rose-500/10
-      text-rose-600
-      hover:bg-rose-500/20
+      px-4 py-2
+      text-sm font-medium
+      rounded-lg
+      bg-rose-500
+      text-white
+      hover:bg-rose-600
       transition
       cursor-pointer
     "
@@ -24,7 +24,10 @@ const ActionButton = ({ children, onClick }) => (
   </button>
 );
 
+
 export default function PacientesPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [patients, setPatients] = useState([]);
   const [activePatient, setActivePatient] = useState(null);
   const [activeSession, setActiveSession] = useState(null);
@@ -34,9 +37,19 @@ export default function PacientesPage() {
      FETCH PACIENTES
   ====================== */
   useEffect(() => {
-    api.get("painel/patients/").then((res) => {
-      setPatients(res.data.patients);
-    });
+    const fetchPatients = async () => {
+      try {
+        const res = await api.get("painel/patients/");
+        setPatients(res.data.patients);
+      } catch (err) {
+        console.error(err);
+        setError("Erro ao carregar pacientes.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
   }, []);
 
   /* =====================
@@ -62,26 +75,50 @@ export default function PacientesPage() {
     }
   };
 
-  /* =====================
-     TABELA DE PACIENTES
-  ====================== */
-  if (!activePatient) {
+  if (loading) {
     return (
       <DashboardLayout title="Pacientes">
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="p-6 text-gray-500">Carregando pacientes...</div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout title="Pacientes">
+        <div className="p-6 text-red-500">{error}</div>
+      </DashboardLayout>
+    );
+  }
+
+
+
+  /* =====================
+    TABELA DE PACIENTES
+  ====================== */
+  if (!activePatient) { 
+    return (
+      <DashboardLayout title="Pacientes">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          
+          {/* Header */}
+          <div className="px-6 py-5 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Lista de Pacientes
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Visualize sessões e desempenho dos seus pacientes.
+            </p>
+          </div>
+
+          {/* Tabela */}
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-gray-500 text-xs">
-                <th className="text-left px-4 py-3 cursor-default">
-                  Paciente
-                </th>
-                <th className="text-left px-2 py-3 cursor-default">
-                  Profissional
-                </th>
-                <th className="text-center px-2 py-3 cursor-default">
-                  Sessões
-                </th>
-                <th className="px-3 py-3" />
+              <tr className="text-gray-500 text-xs bg-gray-50">
+                <th className="text-left px-6 py-3">Paciente</th>
+                <th className="text-left px-4 py-3">Profissional</th>
+                <th className="text-center px-4 py-3">Sessões</th>
+                <th className="px-6 py-3" />
               </tr>
             </thead>
 
@@ -89,45 +126,42 @@ export default function PacientesPage() {
               {patients.map((p) => (
                 <tr
                   key={p.id}
-                  onClick={() => {
-                    if (p.sessions?.length > 0) {
-                      setActivePatient(p);
-                      setActiveSession(null);
-                    }
-                  }}
-                  className="
-                    hover:bg-gray-50
-                    transition
-                    cursor-pointer
-                  "
+                  className="hover:bg-gray-50 transition-all duration-200 cursor-default"
                 >
-                  <td className="px-4 py-3 flex items-center gap-3">
+                  <td className="px-6 py-4 flex items-center gap-4">
                     <img
                       src={p.avatar || semFoto}
                       alt={p.name}
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover"
                     />
                     <span className="font-medium text-gray-800">
                       {p.name}
                     </span>
                   </td>
 
-                  <td className="px-2 py-3 text-gray-600">
+                  <td className="px-4 py-4 text-gray-600">
                     {p.professional ? p.professional.name : "—"}
                   </td>
 
-                  <td className="px-2 py-3 text-center text-gray-600">
-                    {p.sessions?.length || 0}
+                  <td className="px-4 py-4 text-center">
+                    <span className="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
+                      {p.sessions?.length || 0}
+                    </span>
                   </td>
 
-                  <td
-                    className="px-3 py-3 text-right"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <td className="px-6 py-4 text-right">
                     {p.sessions?.length > 0 && (
-                      <ActionButton>Ver</ActionButton>
+                      <ActionButton
+                        onClick={() => {
+                          setActivePatient(p);
+                          setActiveSession(null);
+                        }}
+                      >
+                        Ver
+                      </ActionButton>
                     )}
                   </td>
+
                 </tr>
               ))}
             </tbody>
@@ -136,6 +170,7 @@ export default function PacientesPage() {
       </DashboardLayout>
     );
   }
+
 
   /* =====================
      TELA DO PACIENTE
@@ -147,6 +182,26 @@ export default function PacientesPage() {
           ← Voltar
         </ActionButton>
 
+        {/* Card do Paciente */}
+        <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-4">
+            <img
+              src={activePatient.avatar || semFoto}
+              alt={activePatient.name}
+              className="w-14 h-14 rounded-full object-cover"
+            />
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800">
+                {activePatient.name}
+              </h2>
+              <p className="text-sm text-gray-500">
+                {activePatient.sessions.length} sessões registradas
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Lista de Sessões */}
         <div className="mt-6 space-y-4">
           {activePatient.sessions.map((session) => (
             <div
@@ -155,9 +210,10 @@ export default function PacientesPage() {
               className="
                 cursor-pointer
                 bg-white
-                rounded-xl
+                rounded-2xl
                 shadow-sm
-                p-4
+                border border-gray-100
+                p-5
                 hover:shadow-md
                 transition
               "
@@ -165,15 +221,9 @@ export default function PacientesPage() {
               <p className="font-medium text-gray-800">
                 Sessão •{" "}
                 {new Date(session.start_date).toLocaleDateString()}
-                {session.session_type && (
-                  <span className="text-gray-500 font-normal">
-                    {" "}
-                    • {session.session_type}
-                  </span>
-                )}
               </p>
 
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-2">
                 {session.activities.length} atividades
               </p>
             </div>
@@ -192,111 +242,103 @@ export default function PacientesPage() {
         ← Voltar
       </ActionButton>
 
-      <h2 className="text-lg font-semibold mt-6 mb-10 text-gray-800">
-        Sessão •{" "}
-        {new Date(activeSession.start_date).toLocaleDateString()}
+      {/* Header Sessão */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Sessão • {new Date(activeSession.start_date).toLocaleDateString()}
+        </h2>
 
-        {activeSession.session_type && (
-          <span className="text-gray-500 font-normal">
-            {" "}
-            • Tipo: {activeSession.session_type}
-          </span>
-        )}
+        <div className="flex flex-wrap gap-3 mt-3 text-sm text-gray-600">
+          {activeSession.session_type && (
+            <span>Tipo: {activeSession.session_type}</span>
+          )}
 
-        {activeSession.time_session && (
-          <span className="text-gray-500 font-normal">
-            {" "}
-            • {activeSession.time_session} min
-          </span>
-        )}
+          {activeSession.time_session && (
+            <span>Duração: {activeSession.time_session} min</span>
+          )}
 
-        {activeSession.finally_session && (
-          <span className="text-emerald-600 font-medium">
-            {" "}
-            • Finalizada
-          </span>
-        )}
+          {activeSession.finally_session ? (
+            <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">
+              Finalizada
+            </span>
+          ) : (
+            <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">
+              Em andamento
+            </span>
+          )}
 
-        {activeSession.version_app && (
-          <span className="
-            ml-2
-            text-xs
-            px-2
-            py-0.5
-            rounded-full
-            bg-gray-100
-            text-gray-500
-          ">
-            v{activeSession.version_app}
-          </span>
-        )}
-      </h2>
+          {activeSession.version_app && (
+            <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-500 text-xs">
+              v{activeSession.version_app}
+            </span>
+          )}
+        </div>
+      </div>
 
-      <div className="space-y-20">
+      {/* Atividades */}
+      <div className="space-y-12 mt-10">
         {activeSession.activities.map((activity) => (
           <div
             key={activity.id}
-            className="max-w-4xl mx-auto space-y-5"
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6"
           >
             {activity.path_relative_image ? (
-              <img
-                src={`http://localhost:8000/media/${activity.path_relative_image}`}
-                alt={activity.cod_activity}
-                className="
-                  w-full
-                  max-h-[620px]
-                  object-contain
-                  rounded-xl
-                  shadow-lg
-                "
-              />
+              <div className="rounded-xl overflow-hidden bg-gray-50">
+                <img
+                  src={`http://localhost:8000/media/${activity.path_relative_image}`}
+                  alt={activity.cod_activity}
+                  className="w-full max-h-[600px] object-contain"
+                />
+              </div>
             ) : (
               <div className="h-64 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
                 Sem imagem
               </div>
             )}
 
-            <div className="space-y-2">
+            <div>
               <p className="font-medium text-gray-800">
                 {activity.cod_activity}
               </p>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 mt-1">
                 Duração: {activity.duration || 0}s
               </p>
-
-              <textarea
-                value={
-                  descriptions[activity.id] ??
-                  activity.description ??
-                  ""
-                }
-                onChange={(e) =>
-                  handleDescriptionChange(
-                    activity.id,
-                    e.target.value
-                  )
-                }
-                placeholder="Adicionar descrição da atividade..."
-                className="
-                  w-full
-                  min-h-[110px]
-                  p-3
-                  border
-                  rounded-lg
-                  text-sm
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-rose-300
-                "
-              />
-
-              <ActionButton
-                onClick={() => saveDescription(activity)}
-              >
-                Salvar descrição
-              </ActionButton>
             </div>
+
+            <textarea
+              value={
+                descriptions[activity.id] ??
+                activity.description ??
+                ""
+              }
+              onChange={(e) =>
+                handleDescriptionChange(
+                  activity.id,
+                  e.target.value
+                )
+              }
+              placeholder="Adicionar descrição da atividade..."
+              className="
+                w-full
+                min-h-[120px]
+                p-4
+                border border-gray-200
+                rounded-xl
+                text-sm
+                focus:outline-none
+                focus:ring-2
+                focus:ring-rose-400
+                focus:border-transparent
+                transition
+              "
+            />
+
+            <ActionButton
+              onClick={() => saveDescription(activity)}
+            >
+              Salvar descrição
+            </ActionButton>
           </div>
         ))}
       </div>

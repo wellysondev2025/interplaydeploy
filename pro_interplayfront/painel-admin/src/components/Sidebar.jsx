@@ -85,7 +85,7 @@ export default function Sidebar({ menuOpen, setMenuOpen }) {
               <button
                 onClick={() => {
                   localStorage.clear();
-                  navigate("/login");
+                  navigate("/");
                 }}
                 className="
                   w-full py-3 rounded-xl
