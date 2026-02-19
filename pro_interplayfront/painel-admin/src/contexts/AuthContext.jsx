@@ -10,7 +10,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // função para esperar (usada no retry)
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   // =========================
@@ -19,7 +18,6 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function loadUser() {
       const access = localStorage.getItem("access");
-      const refresh = localStorage.getItem("refresh");
       const savedUser = localStorage.getItem("user");
 
       if (!access) {
@@ -27,7 +25,7 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      // hidrata usuário salvo (UX rápida)
+      // Hidrata usuário salvo para UX rápida
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       }
@@ -37,13 +35,14 @@ export function AuthProvider({ children }) {
 
       while (retries < maxRetries) {
         try {
+          // ✅ Requisição protegida, interceptor envia Authorization
           const res = await api.get("users/me/");
           setUser(res.data);
           localStorage.setItem("user", JSON.stringify(res.data));
           setLoading(false);
           return;
         } catch (err) {
-          // erro de rede / render dormindo
+          // Erro de rede ou backend dormindo
           if (!err.response) {
             console.warn("API dormindo... tentando novamente");
             retries++;
@@ -51,24 +50,13 @@ export function AuthProvider({ children }) {
             continue;
           }
 
-          // 401 → tenta refresh
-          if (err.response.status === 401 && refresh) {
-            try {
-              const tokenRes = await api.post("token/refresh/", { refresh });
-              const newAccess = tokenRes.data.access;
-
-              localStorage.setItem("access", newAccess);
-
-              const res2 = await api.get("users/me/");
-              setUser(res2.data);
-              localStorage.setItem("user", JSON.stringify(res2.data));
-              setLoading(false);
-              return;
-            } catch (refreshErr) {
-              console.error("Refresh token falhou:", refreshErr);
-              logout();
-              return;
-            }
+          // 401 → interceptor do api.js já faz refresh automaticamente
+          if (err.response.status === 401) {
+            console.warn("401 recebido no loadUser, interceptor deve cuidar do refresh");
+            // aqui só tentamos mais algumas vezes antes de logout
+            retries++;
+            await delay(500);
+            continue;
           }
 
           // qualquer outro erro real
@@ -78,7 +66,6 @@ export function AuthProvider({ children }) {
         }
       }
 
-      // se estourou retries → assume offline temporário
       console.warn("Servidor não respondeu após tentativas.");
       setLoading(false);
     }
@@ -89,11 +76,15 @@ export function AuthProvider({ children }) {
   // =========================
   // LOGIN
   // =========================
-  function login(userData, access, refresh) {
+  async function login(userData, access, refresh) {
+    // ✅ salva tokens antes de qualquer requisição
     localStorage.setItem("access", access);
     localStorage.setItem("refresh", refresh);
-    localStorage.setItem("user", JSON.stringify(userData));
+
     setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    navigate("/dashboard");
   }
 
   // =========================

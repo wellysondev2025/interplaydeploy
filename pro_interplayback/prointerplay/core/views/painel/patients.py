@@ -7,6 +7,7 @@ from django.db.models import Prefetch
 from core.models import Patient, Session, Activity, Description
 
 
+
 class PatientListView(APIView):
     """
     Lista pacientes com sessões e atividades.
@@ -22,6 +23,7 @@ class PatientListView(APIView):
     def get(self, request):
         user = request.user
 
+        # 1️⃣ Filtra pacientes
         if user.is_superuser:
             patients = Patient.objects.all()
         elif hasattr(user, "professional_profile"):
@@ -34,10 +36,10 @@ class PatientListView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 🔥 OTIMIZAÇÃO DE QUERY
+        # 2️⃣ Prefetch otimizado
         patients = patients.select_related("professional").prefetch_related(
             Prefetch(
-                "sessions",  # CORRIGIDO (antes era session_set)
+                "sessions",
                 queryset=Session.objects.prefetch_related(
                     Prefetch(
                         "activities",
@@ -47,32 +49,29 @@ class PatientListView(APIView):
             )
         )
 
+        # 3️⃣ Construindo resultado seguro
         result = []
-
         for patient in patients:
+            prof = patient.professional
             sessions_list = []
 
-            for session in patient.sessions.all():  # CORRIGIDO (antes era session_set)
+            for session in patient.sessions.all():
                 activities_list = []
 
                 for activity in session.activities.all():
-                    description = getattr(activity, "description", None)
-
-                    # 🔹 Aqui construímos a URL completa da imagem
+                    desc = getattr(activity, "description", None)
                     image_url = None
-                    if activity.path_relative_image:
-                        image_url = request.build_absolute_uri(f"/media/{activity.path_relative_image}")
+                    if getattr(activity, "image", None):
+                        image_url = request.build_absolute_uri(activity.image.url)
 
                     activities_list.append({
                         "id": activity.id,
                         "cod_activity": activity.cod_activity,
                         "duration": activity.duration,
-                        "path_relative_image": activity.path_relative_image,  # opcional, pode remover
-                        "image_url": image_url,  # 🔹 nova chave
+                        "image_url": image_url,
                         "hash": activity.hash,
-                        "description": description.description if description else ""
+                        "description": desc.description if desc else ""
                     })
-
 
                 sessions_list.append({
                     "id": session.id,
@@ -92,15 +91,12 @@ class PatientListView(APIView):
                 "date_nasc": patient.date_nasc,
                 "hash_patient": patient.hash_patient,
                 "professional": {
-                    "name": patient.professional.name,
-                    "code": patient.professional.code,
-                    "cpf": patient.professional.cpf,
-                    "address": patient.professional.address,
+                    "name": prof.name if prof else "",
+                    "code": prof.code if prof else "",
+                    "cpf": prof.cpf if prof else "",
+                    "address": prof.address if prof else "",
                 },
                 "sessions": sessions_list
             })
 
-        return Response(
-            {"success": True, "patients": result},
-            status=status.HTTP_200_OK
-        )
+        return Response({"success": True, "patients": result}, status=status.HTTP_200_OK)

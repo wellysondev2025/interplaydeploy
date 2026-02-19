@@ -2,7 +2,7 @@
 import uuid
 from django.db import models
 from users.models import User
-
+from cloudinary.models import CloudinaryField
 
 # ---------------------------
 # Profissional
@@ -95,7 +95,7 @@ class Activity(models.Model):
     cod_activity = models.CharField(max_length=50)
     end_date_activity = models.DateTimeField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
-    path_relative_image = models.CharField(max_length=255, blank=True, null=True)  # <--- adicionado
+    image = CloudinaryField('image', blank=True, null=True)
 
     hash = models.CharField(max_length=100, unique=True, blank=True)
 
