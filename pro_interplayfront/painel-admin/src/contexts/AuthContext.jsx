@@ -11,40 +11,56 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   // Carrega usuário ao iniciar app
-    useEffect(() => {
+  useEffect(() => {
     async function loadUser() {
-        const token = localStorage.getItem("access");
-        const savedUser = localStorage.getItem("user");
+      const access = localStorage.getItem("access");
+      const refresh = localStorage.getItem("refresh");
+      const savedUser = localStorage.getItem("user");
 
-        // Se não tem token → não está logado
-        if (!token) {
+      // Se não tem token → não está logado
+      if (!access) {
         setLoading(false);
         return;
-        }
+      }
 
-        // Primeiro: hidrata com user salvo (UX mais rápida)
-        if (savedUser) {
+      // Primeiro: hidrata com user salvo (UX mais rápida)
+      if (savedUser) {
         setUser(JSON.parse(savedUser));
-        }
+      }
 
-        try {
-        // Depois valida no backend
+      try {
+        // Tenta validar access token no backend
         const res = await api.get("users/me/");
         setUser(res.data);
         localStorage.setItem("user", JSON.stringify(res.data));
-        } catch (err) {
-        console.error("Erro ao validar sessão:", err);
+      } catch (err) {
+        // Se deu 401 → access token expirou, tenta refresh
+        if (err.response?.status === 401 && refresh) {
+          try {
+            // Chama endpoint de refresh
+            const tokenRes = await api.post("token/refresh/", { refresh });
+            const newAccess = tokenRes.data.access;
+            localStorage.setItem("access", newAccess);
 
-        // Se nem refresh resolver → logout total
-        logout();
-        } finally {
-        setLoading(false);
+            // Refaz a requisição do usuário
+            const res2 = await api.get("users/me/");
+            setUser(res2.data);
+            localStorage.setItem("user", JSON.stringify(res2.data));
+          } catch (refreshErr) {
+            console.error("Refresh token falhou:", refreshErr);
+            logout();
+          }
+        } else {
+          console.error("Erro ao validar sessão:", err);
+          logout();
         }
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadUser();
-    }, []);
-
+  }, []);
 
   // Função de login centralizada
   function login(userData, access, refresh) {
@@ -55,16 +71,14 @@ export function AuthProvider({ children }) {
   }
 
   // Função de logout global
-    function logout() {
+  function logout() {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
     localStorage.removeItem("user");
 
     setUser(null);
-
     navigate("/");
-    }
-
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>

@@ -6,7 +6,6 @@ import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 
-
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -19,17 +18,18 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    // ✅ toast.promise para exibir loading / sucesso / erro
     toast.promise(
       (async () => {
-        // 1️⃣ Envia login
+        // 1️⃣ Login → recebe tokens
         const response = await api.post("token/", { email, password });
         const { access, refresh } = response.data;
 
-        // 2️⃣ Busca dados do usuário logado
-        const me = await api.get("users/me/", {
-          headers: { Authorization: `Bearer ${access}` },
-        });
+        // salva tokens imediatamente
+        localStorage.setItem("access", access);
+        localStorage.setItem("refresh", refresh);
+
+        // 2️⃣ Busca usuário logado
+        const me = await api.get("users/me/");
 
         // 3️⃣ Salva no contexto
         login(me.data, access, refresh);
@@ -45,7 +45,7 @@ export default function Login() {
         error: "Falha no login. Verifique suas credenciais.",
       }
     ).catch(() => {
-      setError("Email ou senha inválidos."); // ainda mantém a mensagem na tela
+      setError("Email ou senha inválidos.");
     });
   }
 
@@ -58,7 +58,6 @@ export default function Login() {
         backgroundPosition: "center",
       }}
     >
-
       <div className="absolute inset-0 bg-black/40"></div>
 
       <div className="relative w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8">
