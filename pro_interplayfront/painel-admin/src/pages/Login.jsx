@@ -4,6 +4,7 @@ import bgImage from "../assets/bg.jpg";
 import logoLogin from "../assets/logologin.svg";
 import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 
 export default function Login() {
@@ -13,40 +14,39 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
-    try {
-      const response = await api.post("token/", {
-        email,
-        password,
-      });
+    // ✅ toast.promise para exibir loading / sucesso / erro
+    toast.promise(
+      (async () => {
+        // 1️⃣ Envia login
+        const response = await api.post("token/", { email, password });
+        const { access, refresh } = response.data;
 
-      const { access, refresh } = response.data;
+        // 2️⃣ Busca dados do usuário logado
+        const me = await api.get("users/me/", {
+          headers: { Authorization: `Bearer ${access}` },
+        });
 
-      // Buscar usuário logado
-      const me = await api.get("users/me/", {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-      });
+        // 3️⃣ Salva no contexto
+        login(me.data, access, refresh);
 
-      // usa o contexto agora
-      login(me.data, access, refresh);
+        // 4️⃣ Redireciona
+        navigate("/dashboard");
 
-      // Redirecionar
-      navigate("/dashboard");
-
-
-    } catch (err) {
-      setError("Email ou senha inválidos.");
-    } finally {
-      setLoading(false);
-    }
+        return me.data;
+      })(),
+      {
+        loading: "Entrando...",
+        success: (data) => `Bem-vindo(a), ${data.name || "usuário"}!`,
+        error: "Falha no login. Verifique suas credenciais.",
+      }
+    ).catch(() => {
+      setError("Email ou senha inválidos."); // ainda mantém a mensagem na tela
+    });
   }
 
   return (
@@ -58,6 +58,7 @@ export default function Login() {
         backgroundPosition: "center",
       }}
     >
+
       <div className="absolute inset-0 bg-black/40"></div>
 
       <div className="relative w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8">
@@ -113,10 +114,9 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-[#8be9b9] hover:bg-[#83e8ea] text-[#60606a] font-semibold py-3 rounded-xl transition disabled:opacity-70"
+            className="w-full bg-[#8be9b9] hover:bg-[#83e8ea] text-[#60606a] font-semibold py-3 rounded-xl transition"
           >
-            {loading ? "Entrando..." : "Entrar"}
+            Entrar
           </button>
         </form>
 

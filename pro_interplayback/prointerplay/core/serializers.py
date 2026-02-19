@@ -87,6 +87,7 @@ class DescriptionPainelSerializer(serializers.ModelSerializer):
 
 class ActivityPainelSerializer(serializers.ModelSerializer):
     description = DescriptionPainelSerializer(read_only=True)
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
@@ -95,8 +96,17 @@ class ActivityPainelSerializer(serializers.ModelSerializer):
             "cod_activity",
             "duration",
             "path_relative_image",
+            "image_url",
             "description",
         ]
+
+    def get_image_url(self, obj):
+        request = self.context.get("request")
+        if obj.path_relative_image:
+            # Garante que a URL final será absoluta e correta
+            return request.build_absolute_uri(f"/media/{obj.path_relative_image}")
+        return None
+
 
 
 class SessionPainelSerializer(serializers.ModelSerializer):

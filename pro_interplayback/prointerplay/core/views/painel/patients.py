@@ -58,14 +58,21 @@ class PatientListView(APIView):
                 for activity in session.activities.all():
                     description = getattr(activity, "description", None)
 
+                    # 🔹 Aqui construímos a URL completa da imagem
+                    image_url = None
+                    if activity.path_relative_image:
+                        image_url = request.build_absolute_uri(f"/media/{activity.path_relative_image}")
+
                     activities_list.append({
                         "id": activity.id,
                         "cod_activity": activity.cod_activity,
                         "duration": activity.duration,
-                        "path_relative_image": activity.path_relative_image,
+                        "path_relative_image": activity.path_relative_image,  # opcional, pode remover
+                        "image_url": image_url,  # 🔹 nova chave
                         "hash": activity.hash,
                         "description": description.description if description else ""
                     })
+
 
                 sessions_list.append({
                     "id": session.id,

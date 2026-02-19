@@ -7,16 +7,18 @@ import PacientesPage from "./pages/PacientesPage";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./routes/PrivateRoute";
+import { Toaster } from "react-hot-toast"; // <-- IMPORT ÚNICO
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        {/* Toaster só UMA vez, aqui */}
+        <Toaster position="top-right" reverseOrder={false} />
+
         <Routes>
-          {/* login */}
           <Route path="/" element={<Login />} />
 
-          {/* rotas protegidas */}
           <Route
             path="/dashboard"
             element={
@@ -46,6 +48,5 @@ export default function App() {
         </Routes>
       </AuthProvider>
     </BrowserRouter>
-
   );
 }

@@ -18,26 +18,33 @@ class ActivityCreateView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-
-        print("Keys recebidas:", request.data.keys())
-        print("Tamanho image:", len(request.data.get("image", "")))
+        # Recebendo dados
         session_hash = request.data.get('session_hash')
         cod_activity = request.data.get('cod_activity')
         duration = request.data.get('duration')
         image_base64 = request.data.get('image', '')
+        path_relative_image_input = request.data.get('path_relative_image', '')  # Novo campo para testes
 
         if session_hash is None or cod_activity is None or duration is None:
-            return Response({'success': False, 'msg': 'Dados incompletos'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'success': False, 'msg': 'Dados incompletos'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        # Buscar sessão
         try:
             session = Session.objects.get(session_hash=session_hash)
         except Session.DoesNotExist:
-            return Response({'success': False, 'msg': 'Sessão não encontrada'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'success': False, 'msg': 'Sessão não encontrada'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         patient = session.patient
         raw_string = f"{cod_activity}{session.session_hash}{patient.hash_patient}"
         hash_activity = hashlib.sha256(raw_string.encode()).hexdigest()
 
+        # Criar a atividade
         activity = Activity(
             session=session,
             cod_activity=cod_activity,
@@ -48,6 +55,8 @@ class ActivityCreateView(APIView):
         activity.save()
 
         path_relative_image = ''
+
+        # 1️⃣ Se veio imagem em base64 (fluxo normal do game)
         if image_base64:
             try:
                 image_data = base64.b64decode(image_base64.split(",")[-1])
@@ -60,14 +69,20 @@ class ActivityCreateView(APIView):
                     f.write(image_data)
                 path_relative_image = f"{patient.id}/{session.id}/{file_name}"
                 activity.path_relative_image = path_relative_image
-                print("MEDIA_ROOT:", settings.MEDIA_ROOT)
-                print("Folder path:", folder_path)
-                print("Full path:", full_path)
-                print("Arquivo existe após salvar?", os.path.exists(full_path))
                 activity.save()
             except Exception as e:
-                return Response({'success': False, 'msg': f'Erro ao salvar imagem: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {'success': False, 'msg': f'Erro ao salvar imagem: {str(e)}'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
+        # 2️⃣ Se veio path_relative_image diretamente (teste via Postman)
+        elif path_relative_image_input:
+            path_relative_image = path_relative_image_input.lstrip("/")  # remove barra inicial se existir
+            activity.path_relative_image = path_relative_image
+            activity.save()
+
+        # Finaliza sessão se necessário
         if not session.finally_session:
             session.end_date = timezone.now()
             session.time_session = int((session.end_date - session.start_date).total_seconds())
@@ -75,31 +90,7 @@ class ActivityCreateView(APIView):
             session.save()
 
         serializer = ActivitySerializer(activity)
-        return Response({'success': True, 'activity': serializer.data, 'path_image': path_relative_image}, status=status.HTTP_201_CREATED)
-
-
-
-
-
-
-
-class DescriptionUpdateView(APIView):
-    permission_classes = [AllowAny]
-    def post(self, request):
-        activity_hash = request.data.get('activity_hash')
-        description_text = request.data.get('description', '')
-
-        if not activity_hash:
-            return Response({'success': False, 'error': 'activity_hash é obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            activity = Activity.objects.get(hash=activity_hash)
-        except Activity.DoesNotExist:
-            return Response({'success': False, 'error': 'Activity não encontrada'}, status=status.HTTP_404_NOT_FOUND)
-
-        description, created = Description.objects.get_or_create(activity=activity)
-        description.description = description_text
-        description.save()
-
-        serializer = DescriptionSerializer(description)
-        return Response({'success': True, 'description': serializer.data})
+        return Response(
+            {'success': True, 'activity': serializer.data, 'path_image': path_relative_image},
+            status=status.HTTP_201_CREATED
+        )

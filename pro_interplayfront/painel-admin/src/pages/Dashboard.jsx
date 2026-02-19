@@ -3,6 +3,23 @@ import api from "../services/api";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 /* =====================
+   FUNÇÃO DE FORMATAÇÃO DE TEMPO
+===================== */
+// Converte segundos em "Xm Ys"
+function formatTime(seconds) {
+  if (!seconds) return "0s";
+
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+
+  if (mins > 0) {
+    return `${mins}m ${secs}s`;
+  } else {
+    return `${secs}s`;
+  }
+}
+
+/* =====================
    COMPONENTE KPI CARD
 ===================== */
 const KpiCard = ({ title, value }) => (
@@ -52,7 +69,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout title="Dashboard">
-      
+
       {/* =====================
           KPIs
       ===================== */}
@@ -60,7 +77,10 @@ export default function Dashboard() {
         <KpiCard title="Pacientes" value={patientsCount} />
         <KpiCard title="Sessões" value={sessionsCount} />
         <KpiCard title="Atividades" value={activitiesCount} />
-        <KpiCard title="Tempo médio por sessão" value={`${avgSessionTime}s`} />
+        <KpiCard
+          title="Tempo médio por sessão"
+          value={formatTime(avgSessionTime)}
+        />
       </div>
 
       {/* =====================
@@ -80,13 +100,11 @@ export default function Dashboard() {
                   style={{
                     height: `${item.total * 14}px`,
                     background:
-                      "linear-gradient(180deg, #8E3A92 0%, #D86A9B 60%, #FFD1D1 100%))",
+                      "linear-gradient(180deg, #8E3A92 0%, #D86A9B 60%, #FFD1D1 100%)",
                   }}
                 />
                 <span className="text-xs text-gray-500">
-                  {new Date(item.month).toLocaleDateString("pt-BR", {
-                    month: "short",
-                  })}
+                  {new Date(item.month).toLocaleDateString("pt-BR", { month: "short" })}
                 </span>
               </div>
             ))

@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 
 urlpatterns = [
@@ -11,5 +14,8 @@ urlpatterns = [
     path("api/users/", include("users.urls")),
 ]
 
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # NOTA: No Render, arquivos estáticos são servidos via STATIC_ROOT
 # e MEDIA_ROOT não é persistido no plano free. Sem necessidade de static() aqui.
