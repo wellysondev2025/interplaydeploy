@@ -10,59 +10,85 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // função para esperar (usada no retry)
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+  // =========================
   // Carrega usuário ao iniciar app
+  // =========================
   useEffect(() => {
     async function loadUser() {
       const access = localStorage.getItem("access");
       const refresh = localStorage.getItem("refresh");
       const savedUser = localStorage.getItem("user");
 
-      // Se não tem token → não está logado
       if (!access) {
         setLoading(false);
         return;
       }
 
-      // Primeiro: hidrata com user salvo (UX mais rápida)
+      // hidrata usuário salvo (UX rápida)
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       }
 
-      try {
-        // Tenta validar access token no backend
-        const res = await api.get("users/me/");
-        setUser(res.data);
-        localStorage.setItem("user", JSON.stringify(res.data));
-      } catch (err) {
-        // Se deu 401 → access token expirou, tenta refresh
-        if (err.response?.status === 401 && refresh) {
-          try {
-            // Chama endpoint de refresh
-            const tokenRes = await api.post("token/refresh/", { refresh });
-            const newAccess = tokenRes.data.access;
-            localStorage.setItem("access", newAccess);
+      let retries = 0;
+      const maxRetries = 3;
 
-            // Refaz a requisição do usuário
-            const res2 = await api.get("users/me/");
-            setUser(res2.data);
-            localStorage.setItem("user", JSON.stringify(res2.data));
-          } catch (refreshErr) {
-            console.error("Refresh token falhou:", refreshErr);
-            logout();
+      while (retries < maxRetries) {
+        try {
+          const res = await api.get("users/me/");
+          setUser(res.data);
+          localStorage.setItem("user", JSON.stringify(res.data));
+          setLoading(false);
+          return;
+        } catch (err) {
+          // erro de rede / render dormindo
+          if (!err.response) {
+            console.warn("API dormindo... tentando novamente");
+            retries++;
+            await delay(3000);
+            continue;
           }
-        } else {
-          console.error("Erro ao validar sessão:", err);
+
+          // 401 → tenta refresh
+          if (err.response.status === 401 && refresh) {
+            try {
+              const tokenRes = await api.post("token/refresh/", { refresh });
+              const newAccess = tokenRes.data.access;
+
+              localStorage.setItem("access", newAccess);
+
+              const res2 = await api.get("users/me/");
+              setUser(res2.data);
+              localStorage.setItem("user", JSON.stringify(res2.data));
+              setLoading(false);
+              return;
+            } catch (refreshErr) {
+              console.error("Refresh token falhou:", refreshErr);
+              logout();
+              return;
+            }
+          }
+
+          // qualquer outro erro real
+          console.error("Erro real ao validar sessão:", err);
           logout();
+          return;
         }
-      } finally {
-        setLoading(false);
       }
+
+      // se estourou retries → assume offline temporário
+      console.warn("Servidor não respondeu após tentativas.");
+      setLoading(false);
     }
 
     loadUser();
   }, []);
 
-  // Função de login centralizada
+  // =========================
+  // LOGIN
+  // =========================
   function login(userData, access, refresh) {
     localStorage.setItem("access", access);
     localStorage.setItem("refresh", refresh);
@@ -70,7 +96,9 @@ export function AuthProvider({ children }) {
     setUser(userData);
   }
 
-  // Função de logout global
+  // =========================
+  // LOGOUT
+  // =========================
   function logout() {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
@@ -87,7 +115,7 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Hook para usar o contexto
+// hook
 export function useAuth() {
   return useContext(AuthContext);
 }

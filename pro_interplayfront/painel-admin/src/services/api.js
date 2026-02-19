@@ -2,18 +2,19 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  timeout: 20000, // Render free precisa disso (20s)
 });
 
-// controle de refresh em andamento
+// =========================
+// controle de refresh
+// =========================
 let isRefreshing = false;
 let refreshSubscribers = [];
 
-// adiciona callbacks enquanto refresh acontece
 function subscribeTokenRefresh(cb) {
   refreshSubscribers.push(cb);
 }
 
-// executa todos callbacks quando novo token chega
 function onRefreshed(token) {
   refreshSubscribers.forEach((cb) => cb(token));
   refreshSubscribers = [];
@@ -21,7 +22,6 @@ function onRefreshed(token) {
 
 // =========================
 // REQUEST INTERCEPTOR
-// adiciona access token
 // =========================
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access");
@@ -35,19 +35,33 @@ api.interceptors.request.use((config) => {
 
 // =========================
 // RESPONSE INTERCEPTOR
-// refresh automático seguro
 // =========================
 api.interceptors.response.use(
   (response) => response,
+
   async (error) => {
     const originalRequest = error.config;
+
+    // 🟡 ERRO DE REDE / BACKEND DORMINDO
+    if (
+      error.code === "ECONNABORTED" ||
+      error.message === "Network Error" ||
+      !error.response
+    ) {
+      console.warn("Backend possivelmente dormindo... tentando novamente");
+
+      // tenta novamente UMA vez
+      return new Promise((resolve) =>
+        setTimeout(() => resolve(api(originalRequest)), 3000)
+      );
+    }
 
     // se erro não é 401 → segue fluxo normal
     if (error.response?.status !== 401) {
       return Promise.reject(error);
     }
 
-    // se já é tentativa de refresh → logout
+    // se já é refresh e falhou → logout
     if (originalRequest.url.includes("token/refresh")) {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
@@ -55,14 +69,13 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // se não existe refresh token → logout
     const refresh = localStorage.getItem("refresh");
     if (!refresh) {
       window.location.href = "/";
       return Promise.reject(error);
     }
 
-    // se já está fazendo refresh → espera
+    // já existe refresh rodando
     if (isRefreshing) {
       return new Promise((resolve) => {
         subscribeTokenRefresh((token) => {
@@ -85,7 +98,6 @@ api.interceptors.response.use(
 
       localStorage.setItem("access", newAccess);
 
-      // libera todas requisições que estavam aguardando
       onRefreshed(newAccess);
 
       originalRequest.headers.Authorization = `Bearer ${newAccess}`;
