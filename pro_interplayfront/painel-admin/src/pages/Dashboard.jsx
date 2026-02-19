@@ -80,7 +80,7 @@ export default function Dashboard() {
                   style={{
                     height: `${item.total * 14}px`,
                     background:
-                      "linear-gradient(180deg, #6A1B6E 0%, #C04A7D 60%, #FFAAAA 100%)",
+                      "linear-gradient(180deg, #8E3A92 0%, #D86A9B 60%, #FFD1D1 100%))",
                   }}
                 />
                 <span className="text-xs text-gray-500">
