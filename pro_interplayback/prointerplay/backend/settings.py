@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     # local apps
     "core",
     "users",
+
+    "cloudinary",
+    "cloudinary_storage",    
 ]
 
 REST_FRAMEWORK = {
@@ -130,6 +133,20 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+# -----------------------------
+# Cloudinary (Media Storage)
+# -----------------------------
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+}
+
+
 
 # -----------------------------
 # Auth
