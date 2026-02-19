@@ -4,20 +4,22 @@ import { useAuth } from "../contexts/AuthContext";
 export default function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
-  // enquanto valida sessão no backend
+  console.log("PRIVATE ROUTE STATE:", { user, loading });
+
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-500">Validando sessão...</p>
+      <div style={{ padding: 40 }}>
+        <h1>LOADING AUTH...</h1>
       </div>
     );
   }
 
-  // sessão inválida → volta pro login
   if (!user) {
+    console.log("SEM USER → REDIRECT LOGIN");
     return <Navigate to="/" replace />;
   }
 
-  // sessão ok → libera rota
+  console.log("USER OK → RENDER PAGE");
+
   return children;
 }
