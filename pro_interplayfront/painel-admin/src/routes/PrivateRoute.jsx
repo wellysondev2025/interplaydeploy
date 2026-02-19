@@ -4,20 +4,20 @@ import { useAuth } from "../contexts/AuthContext";
 export default function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
-  // enquanto verifica sessão
+  // enquanto valida sessão no backend
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        Carregando...
+      <div className="h-screen flex items-center justify-center bg-white">
+        <p className="text-gray-500">Validando sessão...</p>
       </div>
     );
   }
 
-  // se não tem usuário → bloqueia
+  // sessão inválida → volta pro login
   if (!user) {
     return <Navigate to="/" replace />;
   }
 
-  // se tem usuário → libera
+  // sessão ok → libera rota
   return children;
 }
