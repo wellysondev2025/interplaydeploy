@@ -18,6 +18,9 @@ class ActivityCreateView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+
+        print("Keys recebidas:", request.data.keys())
+        print("Tamanho image:", len(request.data.get("image", "")))
         session_hash = request.data.get('session_hash')
         cod_activity = request.data.get('cod_activity')
         duration = request.data.get('duration')
@@ -57,6 +60,10 @@ class ActivityCreateView(APIView):
                     f.write(image_data)
                 path_relative_image = f"{patient.id}/{session.id}/{file_name}"
                 activity.path_relative_image = path_relative_image
+                print("MEDIA_ROOT:", settings.MEDIA_ROOT)
+                print("Folder path:", folder_path)
+                print("Full path:", full_path)
+                print("Arquivo existe após salvar?", os.path.exists(full_path))
                 activity.save()
             except Exception as e:
                 return Response({'success': False, 'msg': f'Erro ao salvar imagem: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
