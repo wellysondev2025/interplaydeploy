@@ -29,15 +29,7 @@ export default function Sidebar({ menuOpen, setMenuOpen }) {
         <div
           className="h-full flex flex-col shadow-2xl text-white"
           style={{
-            background: `
-              linear-gradient(
-                180deg,
-                #3B0A45 0%,
-                #6A1B6E 40%,
-                #C04A7D 75%,
-                #FFAAAA 110%
-              )
-            `,
+            background: "var(--gradient-vertical)",
           }}
         >
           {/* TOPO */}

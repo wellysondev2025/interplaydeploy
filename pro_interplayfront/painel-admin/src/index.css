@@ -1,1 +1,177 @@
 @import "tailwindcss";
+
+/* =========================
+   THEME — PINK LUXURY (OFICIAL)
+========================= */
+.theme-pink-luxury {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #3B0A45 0%,
+    #6A1B6E 40%,
+    #C04A7D 75%,
+    #FFAAAA 110%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #3B0A45 0%,
+    #6A1B6E 40%,
+    #C04A7D 75%,
+    #FFAAAA 110%
+  );
+}
+
+/* =========================
+   THEME — MIDNIGHT
+========================= */
+.theme-midnight {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #0F2027 0%,
+    #203A43 50%,
+    #2C5364 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #0F2027 0%,
+    #203A43 50%,
+    #2C5364 100%
+  );
+}
+
+/* =========================
+   THEME — ROYAL PURPLE
+========================= */
+.theme-royal {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #200122 0%,
+    #6f0000 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #200122 0%,
+    #6f0000 100%
+  );
+}
+
+/* =========================
+   THEME — EMERALD
+========================= */
+.theme-emerald {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #134E5E 0%,
+    #71B280 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #134E5E 0%,
+    #71B280 100%
+  );
+}
+
+/* =========================
+   THEME — SUNSET
+========================= */
+.theme-sunset {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #C02425 0%,
+    #F0CB35 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #C02425 0%,
+    #F0CB35 100%
+  );
+}
+
+/* =========================
+   THEME — OCEAN
+========================= */
+.theme-ocean {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #0575E6 0%,
+    #00F260 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #0575E6 0%,
+    #00F260 100%
+  );
+}
+
+/* =========================
+   THEME — LAVENDER
+========================= */
+.theme-lavender {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #654ea3 0%,
+    #eaafc8 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #654ea3 0%,
+    #eaafc8 100%
+  );
+}
+
+/* =========================
+   THEME — GOLD
+========================= */
+.theme-gold {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #B78628 0%,
+    #F7E7CE 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #B78628 0%,
+    #F7E7CE 100%
+  );
+}
+
+/* =========================
+   THEME — CRIMSON
+========================= */
+.theme-crimson {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #8E0E00 0%,
+    #1F1C18 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #8E0E00 0%,
+    #1F1C18 100%
+  );
+}
+
+/* =========================
+   THEME — GRAPHITE
+========================= */
+.theme-graphite {
+  --gradient-horizontal: linear-gradient(
+    to right,
+    #232526 0%,
+    #414345 100%
+  );
+
+  --gradient-vertical: linear-gradient(
+    180deg,
+    #232526 0%,
+    #414345 100%
+  );
+}
