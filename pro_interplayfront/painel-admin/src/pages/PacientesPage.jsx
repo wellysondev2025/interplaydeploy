@@ -5,19 +5,38 @@ import semFoto from "../assets/semfoto.svg";
 import toast from "react-hot-toast";
 
 // ================= ACTION BUTTON =================
-export const ActionButton = ({ children, onClick, className }) => (
-  <button
-    onClick={onClick}
-    className={`
-      px-4 py-2 text-sm font-medium rounded-lg
-      bg-rose-500 text-white hover:bg-rose-600
-      transition cursor-pointer
-      ${className || ""}
-    `}
-  >
-    {children}
-  </button>
-);
+export const ActionButton = ({ children, onClick, variant = "primary", className }) => {
+  const baseClasses = `
+    px-4 py-2 text-sm font-medium rounded-lg transition cursor-pointer
+  `;
+
+  let colorClasses = "";
+  if (variant === "primary") {
+    colorClasses = `
+      bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)]
+      hover:bg-[var(--btn-primary-hover)]
+    `;
+  } else if (variant === "secondary") {
+    colorClasses = `
+      bg-[var(--btn-secondary-bg)] text-[var(--btn-secondary-text)]
+      hover:bg-[var(--btn-secondary-hover)]
+    `;
+  } else if (variant === "danger") {
+    colorClasses = `
+      bg-[var(--btn-danger-bg)] text-[var(--btn-danger-text)]
+      hover:bg-[var(--btn-danger-hover)]
+    `;
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={`${baseClasses} ${colorClasses} ${className || ""}`}
+    >
+      {children}
+    </button>
+  );
+};
 
 // ================= PACIENTES TABLE =================
 const PacientesTable = ({ patients, onSelectPatient }) => (
@@ -62,7 +81,9 @@ const PacientesTable = ({ patients, onSelectPatient }) => (
             </td>
             <td className="px-6 py-4 text-right">
               {p.sessions?.length > 0 && (
-                <ActionButton onClick={() => onSelectPatient(p)}>Ver</ActionButton>
+                <ActionButton onClick={() => onSelectPatient(p)} variant="primary">
+                  Ver
+                </ActionButton>
               )}
             </td>
           </tr>
@@ -75,7 +96,7 @@ const PacientesTable = ({ patients, onSelectPatient }) => (
 // ================= PATIENT DETAILS =================
 const PatientDetails = ({ patient, onBack, onSelectSession }) => (
   <>
-    <ActionButton onClick={onBack}>← Voltar</ActionButton>
+    <ActionButton onClick={onBack} variant="secondary">← Voltar</ActionButton>
 
     <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center gap-4">
@@ -109,134 +130,136 @@ const PatientDetails = ({ patient, onBack, onSelectSession }) => (
 );
 
 // ================= SESSION DETAILS =================
-  const SessionDetails = ({ session, onBack, descriptions, setDescriptions, saveDescription, setSession }) => {
-    const handleDescriptionChange = (activityId, value) => {
-      setDescriptions((prev) => ({ ...prev, [activityId]: value }));
-    };
+const SessionDetails = ({ session, onBack, descriptions, setDescriptions, saveDescription, setSession }) => {
+  const handleDescriptionChange = (activityId, value) => {
+    setDescriptions((prev) => ({ ...prev, [activityId]: value }));
+  };
 
-    return (
-      <>
-        <ActionButton onClick={onBack}>← Voltar</ActionButton>
+  return (
+    <>
+      <ActionButton onClick={onBack} variant="secondary">← Voltar</ActionButton>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-          <h2 className="text-lg font-semibold text-gray-800">
-            Sessão • {new Date(session.start_date).toLocaleDateString()}
-          </h2>
-          <div className="flex flex-wrap gap-3 mt-3 text-sm text-gray-600">
-            {session.session_type && <span>Tipo: {session.session_type}</span>}
-            {session.time_session && <span>Duração: {session.time_session} min</span>}
-            {session.finally_session ? (
-              <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Finalizada</span>
-            ) : (
-              <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Em andamento</span>
-            )}
-            {session.version_app && (
-              <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-500 text-xs">v{session.version_app}</span>
-            )}
-          </div>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Sessão • {new Date(session.start_date).toLocaleDateString()}
+        </h2>
+        <div className="flex flex-wrap gap-3 mt-3 text-sm text-gray-600">
+          {session.session_type && <span>Tipo: {session.session_type}</span>}
+          {session.time_session && <span>Duração: {session.time_session} min</span>}
+          {session.finally_session ? (
+            <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Finalizada</span>
+          ) : (
+            <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Em andamento</span>
+          )}
+          {session.version_app && (
+            <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-500 text-xs">v{session.version_app}</span>
+          )}
+        </div>
 
-          <div className="space-y-12 mt-10">
-            {session.activities.map((activity) => (
-              <div key={activity.id} className="flex flex-col md:flex-row gap-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="space-y-12 mt-10">
+          {session.activities.map((activity) => (
+            <div key={activity.id} className="flex flex-col md:flex-row gap-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
 
-                {/* Imagem */}
-                <div className="md:w-1/2 flex items-center justify-center rounded-xl overflow-hidden bg-gray-50">
-                  {activity.image_url ? (
-                    <img
-                      src={activity.image_url}
-                      alt={activity.cod_activity}
-                      className="w-full h-full object-contain"
-                    />
-                  ) : (
-                    <div className="h-64 flex items-center justify-center text-gray-400">Sem imagem</div>
-                  )}
+              {/* Imagem */}
+              <div className="md:w-1/2 flex items-center justify-center rounded-xl overflow-hidden bg-gray-50">
+                {activity.image_url ? (
+                  <img
+                    src={activity.image_url}
+                    alt={activity.cod_activity}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-gray-400">Sem imagem</div>
+                )}
+              </div>
+
+              {/* Informações */}
+              <div className="md:w-1/2 flex flex-col justify-between gap-4">
+                <div>
+                  <p className="font-medium text-gray-800">{activity.cod_activity}</p>
+                  <p className="text-sm text-gray-500">Duração: {activity.duration || 0}s</p>
+
+                  {/* Observação/descrição sempre visível */}
+                  <p className="mt-2 text-sm text-gray-700">
+                    {activity.description?.text || "Sem observação"}
+                  </p>
                 </div>
 
-                {/* Informações */}
-                <div className="md:w-1/2 flex flex-col justify-between gap-4">
-                  <div>
-                    <p className="font-medium text-gray-800">{activity.cod_activity}</p>
-                    <p className="text-sm text-gray-500">Duração: {activity.duration || 0}s</p>
-
-                    {/* Observação/descrição sempre visível */}
-                    <p className="mt-2 text-sm text-gray-700">
-                      {activity.description?.text || "Sem observação"}
-                    </p>
-                  </div>
-
-                  {/* Botão de editar/adicionar descrição */}
-                  {!activity.editing ? (
-                    <ActionButton
-                      onClick={() => {
-                        setSession((prev) => ({
-                          ...prev,
-                          activities: prev.activities.map((a) =>
-                            a.id === activity.id ? { ...a, editing: true } : a
-                          ),
-                        }));
-                        setDescriptions((prev) => ({
-                          ...prev,
-                          [activity.id]: activity.description?.text || "",
-                        }));
-                      }}
-                    >
-                      {activity.description ? "Editar descrição" : "Adicionar descrição"}
-                    </ActionButton>
-                  ) : (
-                    <>
-                      <textarea
-                        value={descriptions[activity.id] ?? ""}
-                        onChange={(e) => handleDescriptionChange(activity.id, e.target.value)}
-                        placeholder="Adicionar descrição da atividade..."
-                        className="w-full min-h-[120px] p-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition"
-                      />
-                      <div className="flex gap-2 mt-2">
-                        <ActionButton
-                          onClick={async () => {
-                            try {
-                              await saveDescription(activity);
-                              setSession((prev) => ({
-                                ...prev,
-                                activities: prev.activities.map((a) =>
-                                  a.id === activity.id
-                                    ? { ...a, editing: false, description: { text: descriptions[activity.id] } }
-                                    : a
-                                ),
-                              }));
-                              toast.success("Descrição salva com sucesso!", { duration: 3000 });
-                            } catch (err) {
-                              console.error(err);
-                              toast.error("Erro ao salvar descrição", { duration: 3000 });
-                            }
-                          }}
-                        >
-                          Salvar
-                        </ActionButton>
-
-                        <ActionButton
-                          onClick={() => {
+                {/* Botão de editar/adicionar descrição */}
+                {!activity.editing ? (
+                  <ActionButton
+                    onClick={() => {
+                      setSession((prev) => ({
+                        ...prev,
+                        activities: prev.activities.map((a) =>
+                          a.id === activity.id ? { ...a, editing: true } : a
+                        ),
+                      }));
+                      setDescriptions((prev) => ({
+                        ...prev,
+                        [activity.id]: activity.description?.text || "",
+                      }));
+                    }}
+                    variant="primary"
+                  >
+                    {activity.description ? "Editar descrição" : "Adicionar descrição"}
+                  </ActionButton>
+                ) : (
+                  <>
+                    <textarea
+                      value={descriptions[activity.id] ?? ""}
+                      onChange={(e) => handleDescriptionChange(activity.id, e.target.value)}
+                      placeholder="Adicionar descrição da atividade..."
+                      className="w-full min-h-[120px] p-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition"
+                    />
+                    <div className="flex gap-2 mt-2">
+                      <ActionButton
+                        onClick={async () => {
+                          try {
+                            await saveDescription(activity);
                             setSession((prev) => ({
                               ...prev,
                               activities: prev.activities.map((a) =>
-                                a.id === activity.id ? { ...a, editing: false } : a
+                                a.id === activity.id
+                                  ? { ...a, editing: false, description: { text: descriptions[activity.id] } }
+                                  : a
                               ),
                             }));
-                          }}
-                          className="bg-gray-300 text-gray-700 hover:bg-gray-400"
-                        >
-                          Cancelar
-                        </ActionButton>
-                      </div>
-                    </>
-                  )}
-                </div>
+                            toast.success("Descrição salva com sucesso!", { duration: 3000 });
+                          } catch (err) {
+                            console.error(err);
+                            toast.error("Erro ao salvar descrição", { duration: 3000 });
+                          }
+                        }}
+                        variant="primary"
+                      >
+                        Salvar
+                      </ActionButton>
+
+                      <ActionButton
+                        onClick={() => {
+                          setSession((prev) => ({
+                            ...prev,
+                            activities: prev.activities.map((a) =>
+                              a.id === activity.id ? { ...a, editing: false } : a
+                            ),
+                          }));
+                        }}
+                        variant="secondary"
+                      >
+                        Cancelar
+                      </ActionButton>
+                    </div>
+                  </>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      </>
-    );
-  };
+      </div>
+    </>
+  );
+};
 
 // ================= PACIENTES PAGE =================
 export default function PacientesPage() {

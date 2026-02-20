@@ -16,7 +16,7 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   async function handleSubmit(e) {
@@ -32,11 +32,6 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
       cpf: formData.cpf,
       address: formData.address,
     };
-
-    if (!professional) {
-      payload.email = formData.email;
-      payload.password = formData.password;
-    }
 
     try {
       const url = professional
@@ -58,17 +53,8 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
     <div className="fixed inset-0 z-50 bg-black/30 flex justify-center items-start p-4">
       <form
         onSubmit={handleSubmit}
-        className="
-          bg-white
-          rounded-2xl
-          shadow-xl
-          w-96
-          max-h-[calc(100vh-80px)]
-          overflow-auto
-          relative
-          p-6
-        "
-      >   
+        className="bg-surface rounded-2xl shadow-xl w-full max-w-md max-h-[calc(100vh-80px)] overflow-auto relative p-6 flex flex-col gap-4"
+      >
         {/* Botão de fechar */}
         <button
           type="button"
@@ -78,85 +64,93 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
           ×
         </button>
 
-        <h3 className="text-xl font-bold mb-4 text-center">
+        <h3 className="text-xl font-bold text-center text-theme">
           {professional ? "Editar Profissional" : "Novo Profissional"}
         </h3>
 
-        {/* Campos de criação */}
-        {!professional && (
-          <>
-            <label className="block mb-2 font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
+        <div className="flex flex-col gap-4">
+          {/* Campos de criação */}
+          {!professional && (
+            <>
+              <div className="flex flex-col">
+                <label className="mb-1 font-medium text-theme">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="input-theme rounded-lg px-3 py-2 w-full"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="mb-1 font-medium text-theme">Senha</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="input-theme rounded-lg px-3 py-2 w-full"
+                />
+              </div>
+            </>
+          )}
+
+          {/* Dropdown */}
+          <div className="flex flex-col">
+            <label className="mb-1 font-medium text-theme">Nível de acesso</label>
+            <select
+              name="role"
+              value={formData.role}
               onChange={handleChange}
               required
-              className="w-full mb-3 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-            />
-
-            <label className="block mb-2 font-medium">Senha</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full mb-3 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-            />
-          </>
-        )}
-
-        {/* Dropdown de privilégios */}
-        <label className="block mb-2 font-medium">Nível de acesso</label>
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          required
-          className="w-full mb-3 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-        >
-          <option value="">Selecione o nível</option>
-          <option value="admin">Admin (privilégios totais)</option>
-          <option value="user">Usuário normal</option>
-        </select>
-
-        {/* Outros campos */}
-        {["code", "name", "cpf", "address"].map(field => (
-          <div key={field} className="mb-3">
-            <label className="block mb-1 font-medium">
-              {field === "code"
-                ? "Código"
-                : field.charAt(0).toUpperCase() + field.slice(1)}
-            </label>
-            <input
-              type="text"
-              name={field}
-              value={formData[field]}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-            />
+              className="input-theme rounded-lg px-3 py-2 w-full"
+            >
+              <option value="">Selecione o nível</option>
+              <option value="admin">Admin (privilégios totais)</option>
+              <option value="user">Usuário normal</option>
+            </select>
           </div>
-        ))}
 
-        {/* Botões */}
-        <div className="flex justify-end gap-3 mt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
-            disabled={loadingSubmit}
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition"
-            disabled={loadingSubmit}
-          >
-            {loadingSubmit ? "Salvando..." : "Salvar"}
-          </button>
+          {/* Outros campos */}
+          {["code", "name", "cpf", "address"].map((field) => (
+            <div key={field} className="flex flex-col">
+              <label className="mb-1 font-medium text-theme">
+                {field === "code"
+                  ? "Código"
+                  : field.charAt(0).toUpperCase() + field.slice(1)}
+              </label>
+              <input
+                type="text"
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
+                required
+                className="input-theme rounded-lg px-3 py-2 w-full"
+              />
+            </div>
+          ))}
+
+          {/* Botões */}
+          <div className="flex justify-end gap-3 mt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg btn-secondary transition disabled:opacity-50"
+              disabled={loadingSubmit}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-lg btn-primary transition disabled:opacity-50"
+              disabled={loadingSubmit}
+            >
+              {loadingSubmit ? "Salvando..." : "Salvar"}
+            </button>
+          </div>
         </div>
       </form>
     </div>

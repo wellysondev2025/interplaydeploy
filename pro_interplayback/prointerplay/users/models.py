@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
+from organizations.models import Organization
 
 
 class UserManager(BaseUserManager):
@@ -44,6 +45,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    organization = models.ForeignKey(
+    Organization,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="users"
+)
 
     objects = UserManager()
 

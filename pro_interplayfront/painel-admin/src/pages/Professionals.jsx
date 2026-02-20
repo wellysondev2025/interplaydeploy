@@ -58,7 +58,7 @@ export default function Professionals() {
   if (loadingUser || loadingProfessionals) {
     return (
       <DashboardLayout title="Profissionais">
-        <p className="p-6 text-gray-500">Carregando...</p>
+        <p className="p-6 text-muted">Carregando...</p>
       </DashboardLayout>
     );
   }
@@ -66,7 +66,7 @@ export default function Professionals() {
   if (!user?.is_superuser) {
     return (
       <DashboardLayout title="Profissionais">
-        <p className="p-6 text-gray-500">
+        <p className="p-6 text-muted">
           Você não tem permissão para acessar esta página.
         </p>
       </DashboardLayout>
@@ -76,22 +76,14 @@ export default function Professionals() {
   return (
     <DashboardLayout title="Profissionais">
       {/* Container principal */}
-      <div
-        className="
-          bg-white/80
-          backdrop-blur
-          rounded-3xl
-          shadow-xl
-          p-8
-        "
-      >
+      <div className="bg-surface backdrop-blur rounded-3xl shadow-xl p-8">
         {/* Cabeçalho da página */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-[#3B0A45]">
+            <h2 className="text-2xl font-bold card-pro-title">
               Gestão de Profissionais
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted">
               Gerencie os profissionais cadastrados no sistema
             </p>
           </div>
@@ -101,14 +93,14 @@ export default function Professionals() {
               setEditProfessional(null);
               setOpenForm(true);
             }}
+            style={{
+              background: "var(--gradient-horizontal)",
+              color: "var(--btn-primary-text)"
+            }}
             className="
               px-6 py-2.5
               rounded-xl
-              text-white
               font-medium
-              bg-gradient-to-r
-              from-[#3B0A45]
-              to-[#5A1661]
               hover:opacity-90
               transition
               shadow-md
@@ -119,18 +111,18 @@ export default function Professionals() {
         </div>
 
         {error && (
-          <p className="text-red-500 mb-6">
-            {error}
-          </p>
+          <p className="text-red-500 mb-6">{error}</p>
         )}
 
         {/* Lista */}
-        <ProfessionalsList
-          professionals={professionals}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          canEdit={user.is_superuser}
-        />
+        <div className="px-0 sm:px-2">
+          <ProfessionalsList
+            professionals={professionals}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            canEdit={user.is_superuser}
+          />
+        </div>
 
         {/* Modal */}
         {openForm && (

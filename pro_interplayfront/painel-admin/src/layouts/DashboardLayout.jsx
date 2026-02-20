@@ -8,7 +8,7 @@ export default function DashboardLayout({ title, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-theme">
       {/* Sidebar */}
       <Sidebar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
@@ -28,7 +28,12 @@ export default function DashboardLayout({ title, children }) {
           }}
         >
           {/* Overlay branco */}
-          <div className="absolute inset-0 bg-white/90"></div>
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: "rgba(255,255,255,0.85)"
+            }}
+          ></div>
 
           {/* Conteúdo real */}
           <div className="relative z-10">{children}</div>

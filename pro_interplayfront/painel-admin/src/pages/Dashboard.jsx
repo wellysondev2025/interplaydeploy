@@ -23,9 +23,9 @@ function formatTime(seconds) {
    COMPONENTE KPI CARD
 ===================== */
 const KpiCard = ({ title, value }) => (
-  <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6 border border-gray-100">
-    <p className="text-sm text-gray-500">{title}</p>
-    <p className="text-3xl font-bold text-gray-800 mt-2">{value}</p>
+  <div className="card-theme rounded-2xl transition-all duration-300 p-6">
+    <p className="text-sm text-muted">{title}</p>
+    <p className="text-3xl font-bold text-theme mt-2">{value}</p>
   </div>
 );
 
@@ -86,8 +86,8 @@ export default function Dashboard() {
       {/* =====================
           SESSÕES POR MÊS
       ===================== */}
-      <div className="mt-12 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-6">
+      <div className="mt-12 card-theme rounded-2xl p-8">
+        <h3 className="text-lg font-semibold text-theme mb-6">
           Sessões nos últimos meses
         </h3>
 
@@ -129,7 +129,7 @@ export default function Dashboard() {
             {lastSessions.map((session) => (
               <div
                 key={session.id}
-                className="flex items-center justify-between bg-gray-50 rounded-xl px-6 py-4 hover:bg-gray-100 transition-all duration-200"
+                className="flex items-center justify-between bg-surface-soft rounded-xl px-6 py-4 transition-all duration-200"
               >
                 <div>
                   <p className="text-base font-semibold text-gray-800">
@@ -149,8 +149,8 @@ export default function Dashboard() {
                   <span
                     className={`inline-block mt-1 px-3 py-1 text-xs rounded-full font-medium ${
                       session.finally_session
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
+                        ? "status-success"
+                        : "status-warning"
                     }`}
                   >
                     {session.finally_session ? "Finalizada" : "Em andamento"}

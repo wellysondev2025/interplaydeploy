@@ -1,177 +1,238 @@
+/* =========================
+   TAILWIND IMPORT
+========================= */
 @import "tailwindcss";
 
 /* =========================
-   THEME — PINK LUXURY (OFICIAL)
+   VARIÁVEIS GLOBAIS — Padrão Pink Luxury
 ========================= */
+:root,
 .theme-pink-luxury {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #3B0A45 0%,
-    #6A1B6E 40%,
-    #C04A7D 75%,
-    #FFAAAA 110%
-  );
+  /* Backgrounds */
+  --color-bg: #f3f4f6;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f9fafb;
 
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #3B0A45 0%,
-    #6A1B6E 40%,
-    #C04A7D 75%,
-    #FFAAAA 110%
-  );
+  /* Textos */
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+
+  /* Bordas */
+  --color-border: #e5e7eb;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+
+  /* Botões */
+  --btn-primary-bg: #5A1661;
+  --btn-primary-hover: #3B0A45;
+  --btn-primary-text: #ffffff;
+
+  --btn-secondary-bg: #e5e7eb;
+  --btn-secondary-hover: #d1d5db;
+  --btn-secondary-text: #1f2937;
+
+  --btn-danger-bg: #ef4444;
+  --btn-danger-hover: #dc2626;
+  --btn-danger-text: #ffffff;
+
+  /* Inputs */
+  --input-bg: var(--color-surface);
+  --input-border: #e5e7eb;
+  --input-text: var(--color-text);
+
+  /* Gradientes */
+  --gradient-horizontal: linear-gradient(to right, #3B0A45 0%, #6A1B6E 40%, #C04A7D 75%, #FFAAAA 110%);
+  --gradient-vertical: linear-gradient(180deg, #3B0A45 0%, #6A1B6E 40%, #C04A7D 75%, #FFAAAA 110%);
+  
+  /* Cards */
+  --card-border: #ede9fe;
+  --card-title: #3B0A45;
+  --card-header-gradient: linear-gradient(to bottom right, #3B0A45, #5A1661);
 }
 
 /* =========================
-   THEME — MIDNIGHT
+   CLASSES GERAIS
+========================= */
+.bg-theme { background-color: var(--color-bg); }
+.bg-surface { background-color: var(--color-surface); }
+.bg-surface-soft { background-color: var(--color-surface-soft); }
+
+.text-theme { color: var(--color-text); }
+.text-muted { color: var(--color-text-muted); }
+
+.border-theme { border-color: var(--color-border); }
+
+.card-theme {
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+}
+
+/* =========================
+   BOTÕES GLOBAIS
+========================= */
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  transition: all 0.2s;
+}
+.btn-primary:hover { background-color: var(--btn-primary-hover); }
+
+.btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background-color: var(--btn-secondary-hover); }
+
+.btn-danger-solid {
+  background-color: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
+  transition: all 0.2s;
+}
+.btn-danger-solid:hover { background-color: var(--btn-danger-hover); }
+
+/* =========================
+   OUTLINE BUTTONS — SÓLIDOS E CONSISTENTES
+========================= */
+.btn-outline-primary {
+  border: 1px solid var(--btn-primary-bg);
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  transition: all 0.2s;
+}
+.btn-outline-primary:hover {
+  background-color: var(--btn-primary-hover);
+  border-color: var(--btn-primary-hover);
+  color: var(--btn-primary-text);
+}
+
+.btn-outline-danger {
+  border: 1px solid var(--btn-danger-bg);
+  background-color: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
+  transition: all 0.2s;
+}
+.btn-outline-danger:hover {
+  background-color: var(--btn-danger-hover);
+  border-color: var(--btn-danger-hover);
+  color: var(--btn-danger-text);
+}
+
+/* =========================
+   INPUTS E SELECTS
+========================= */
+.input-theme {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  outline: none;
+  transition: all 0.2s;
+}
+.input-theme:focus {
+  border-color: var(--btn-primary-bg);
+  box-shadow: 0 0 0 2px rgba(90,22,97,0.2);
+}
+
+/* =========================
+   CARDS PROFISSIONAIS
+========================= */
+.card-pro {
+  background-color: var(--color-surface);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+  transition: all 0.2s;
+}
+.card-pro-header {
+  background: var(--card-header-gradient);
+  height: 7rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.card-pro-title {
+  color: var(--card-title);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* =========================
+   THEMES ADICIONAIS
 ========================= */
 .theme-midnight {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #0F2027 0%,
-    #203A43 50%,
-    #2C5364 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #0F2027 0%,
-    #203A43 50%,
-    #2C5364 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #0F2027 0%, #203A43 50%, #2C5364 100%);
+  --gradient-vertical: linear-gradient(180deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+  --btn-primary-bg: #203A43;
+  --btn-primary-hover: #0F2027;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — ROYAL PURPLE
-========================= */
 .theme-royal {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #200122 0%,
-    #6f0000 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #200122 0%,
-    #6f0000 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #200122 0%, #6f0000 100%);
+  --gradient-vertical: linear-gradient(180deg, #200122 0%, #6f0000 100%);
+  --btn-primary-bg: #6f0000;
+  --btn-primary-hover: #200122;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — EMERALD
-========================= */
 .theme-emerald {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #134E5E 0%,
-    #71B280 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #134E5E 0%,
-    #71B280 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #134E5E 0%, #71B280 100%);
+  --gradient-vertical: linear-gradient(180deg, #134E5E 0%, #71B280 100%);
+  --btn-primary-bg: #134E5E;
+  --btn-primary-hover: #0B3B36;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — SUNSET
-========================= */
 .theme-sunset {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #C02425 0%,
-    #F0CB35 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #C02425 0%,
-    #F0CB35 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #C02425 0%, #F0CB35 100%);
+  --gradient-vertical: linear-gradient(180deg, #C02425 0%, #F0CB35 100%);
+  --btn-primary-bg: #C02425;
+  --btn-primary-hover: #A6221E;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — OCEAN
-========================= */
 .theme-ocean {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #0575E6 0%,
-    #00F260 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #0575E6 0%,
-    #00F260 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #0575E6 0%, #00F260 100%);
+  --gradient-vertical: linear-gradient(180deg, #0575E6 0%, #00F260 100%);
+  --btn-primary-bg: #0575E6;
+  --btn-primary-hover: #005BB5;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — LAVENDER
-========================= */
 .theme-lavender {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #654ea3 0%,
-    #eaafc8 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #654ea3 0%,
-    #eaafc8 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #654ea3 0%, #eaafc8 100%);
+  --gradient-vertical: linear-gradient(180deg, #654ea3 0%, #eaafc8 100%);
+  --btn-primary-bg: #654ea3;
+  --btn-primary-hover: #45267B;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — GOLD
-========================= */
 .theme-gold {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #B78628 0%,
-    #F7E7CE 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #B78628 0%,
-    #F7E7CE 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #B78628 0%, #F7E7CE 100%); 
+  --gradient-vertical: linear-gradient(180deg, #B78628 0%, #F7E7CE 100%);
+  --btn-primary-bg: #B78628;
+  --btn-primary-hover: #8B641F;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — CRIMSON
-========================= */
 .theme-crimson {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #8E0E00 0%,
-    #1F1C18 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #8E0E00 0%,
-    #1F1C18 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #8E0E00 0%, #1F1C18 100%);
+  --gradient-vertical: linear-gradient(180deg, #8E0E00 0%, #1F1C18 100%);
+  --btn-primary-bg: #8E0E00;
+  --btn-primary-hover: #5A0500;
+  --btn-primary-text: #ffffff;
 }
 
-/* =========================
-   THEME — GRAPHITE
-========================= */
 .theme-graphite {
-  --gradient-horizontal: linear-gradient(
-    to right,
-    #232526 0%,
-    #414345 100%
-  );
-
-  --gradient-vertical: linear-gradient(
-    180deg,
-    #232526 0%,
-    #414345 100%
-  );
+  --gradient-horizontal: linear-gradient(to right, #232526 0%, #414345 100%);
+  --gradient-vertical: linear-gradient(180deg, #232526 0%, #414345 100%);
+  --btn-primary-bg: #414345;
+  --btn-primary-hover: #232526;
+  --btn-primary-text: #ffffff;
 }
