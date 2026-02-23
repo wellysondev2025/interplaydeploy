@@ -1,7 +1,4 @@
-import uuid
 from django.db import models
-from users.models import User
-from cloudinary.models import CloudinaryField
 from .activity import Activity
 
 

@@ -1,7 +1,5 @@
 import uuid
 from django.db import models
-from users.models import User
-from .session import Session
 from .patient import Patient
 from cloudinary.models import CloudinaryField
 
@@ -15,7 +13,7 @@ class Session(models.Model):
         related_name="sessions"
     )
 
-    session_hash = models.CharField(max_length=100, unique=True, blank=True)
+    session_hash = models.CharField(max_length=36, unique=True, editable=False)
 
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
