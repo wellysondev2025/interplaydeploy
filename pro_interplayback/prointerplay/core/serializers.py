@@ -24,7 +24,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = ['id', 'session', 'cod_activity', 'end_date_activity',
-                  'path_relative_image', 'duration', 'hash']
+                  'image', 'duration', 'hash']
 
 
 # ------------------- Descriptions -------------------
