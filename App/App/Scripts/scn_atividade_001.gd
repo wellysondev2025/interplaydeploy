@@ -449,17 +449,32 @@ func EnviarAtividade():
 	var ActivityEndTime = Time.get_unix_time_from_system()
 	var tempoTotalAtividade = ActivityEndTime - ActivityInitalTime
 
+	# Captura o viewport
 	var viewport = get_viewport()
 	var img = viewport.get_texture().get_image()
-	img.resize(img.get_width() / 2, img.get_height() / 2)
 
+	# Corrige a orientação da imagem
+	img.flip_y()
+
+	# Reduz a imagem para tamanho seguro (ajuste conforme necessário)
+	var max_width = 800
+	var max_height = 600
+	var scale_factor = min(max_width / img.get_width(), max_height / img.get_height(), 1)
+	var new_width = int(img.get_width() * scale_factor)
+	var new_height = int(img.get_height() * scale_factor)
+	img.resize(new_width, new_height)
+
+	# Salva a imagem para buffer PNG
 	var image_buffer = img.save_png_to_buffer()
-	var image_base64 = "data:image/png;base64," + Marshalls.raw_to_base64(image_buffer)
 
-	print("Imagem capturada:", img.get_width(), "x", img.get_height())
-	print("Tamanho do Base64 da imagem:", image_base64.length())
-	print("Preview Base64 (primeiros 50 chars):", image_base64.substr(0, 50))
+	# Converte para base64 limpo
+	var image_base64 = "data:image/png;base64," + Marshalls.raw_to_base64(image_buffer).strip_edges()
 
+	print("Imagem capturada:", new_width, "x", new_height)
+	print("Tamanho do Base64:", image_base64.length())
+	print("Preview Base64 (50 primeiros chars):", image_base64.substr(0, 50))
+
+	# Monta payload
 	var payload = {
 		"session_hash": InterplayController.ActualSessionHash,
 		"cod_activity": InterplayController.getActivityName(),
@@ -467,6 +482,7 @@ func EnviarAtividade():
 		"duration": int(round(tempoTotalAtividade))
 	}
 
+	# Envia para a API
 	var url = InterplayController.ApiRoot + "game/activity/create/"
 	var headers = ["Content-Type: application/json"]
 	var body = JSON.stringify(payload)
