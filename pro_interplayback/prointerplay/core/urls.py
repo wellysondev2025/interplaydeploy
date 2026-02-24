@@ -36,10 +36,10 @@ from core.views.painel.professionals import (
 urlpatterns = [
     # 🎮 GAME
     path("game/patient/create/", PatientCreateView.as_view()),
-    path("game/patient/get/", PatientGetByHashView.as_view()),
+    path("game/patient/get/", PatientGetByHashView.as_view(),),
     path("game/session/create/", SessionCreateView.as_view()),
     path("game/session/finalize/", SessionFinalizeView.as_view()),
-    path("game/activity/create/", ActivityCreateView.as_view()),
+    path("game/activity/create/", ActivityCreateView.as_view(), name="activity-create"),
     path("game/professional/validate/", ProfessionalValidateView.as_view()),
 
     # 🧠 PAINEL

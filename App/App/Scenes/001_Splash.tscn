@@ -1,0 +1,62 @@
+[gd_scene load_steps=8 format=3 uid="uid://cc48s37eq1cp7"]
+
+[ext_resource type="Script" path="res://Scripts/001_Splash.gd" id="1_yhgn7"]
+[ext_resource type="Texture2D" uid="uid://5myf7ne0e2f" path="res://Assets/000_Geral/LOGO-INTERPLAY 1.png" id="2_ufcye"]
+[ext_resource type="Texture2D" uid="uid://dwrhesm4pwbjp" path="res://Assets/000_Geral/Base.png" id="3_wmb4j"]
+[ext_resource type="Texture2D" uid="uid://bichy5w0m5vcg" path="res://Assets/Splash/ImagemAbertura.png" id="4_43s3a"]
+[ext_resource type="VideoStream" path="res://Assets/Splash/AberturaInterplay.ogv" id="4_xvgvt"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_8m44y"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_wfyjg"]
+
+[node name="ScnSplash" type="Node2D"]
+script = ExtResource("1_yhgn7")
+
+[node name="BG" type="TextureRect" parent="."]
+material = SubResource("CanvasItemMaterial_8m44y")
+offset_right = 720.0
+offset_bottom = 1280.0
+texture = SubResource("CanvasTexture_wfyjg")
+
+[node name="Logo-interplay1" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(360, 536)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_ufcye")
+
+[node name="Base" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(360, 1088)
+scale = Vector2(0.962667, 0.978803)
+texture = ExtResource("3_wmb4j")
+
+[node name="BackGroundNovo" type="Sprite2D" parent="."]
+position = Vector2(363.5, 646)
+scale = Vector2(0.90559, 1.26839)
+texture = ExtResource("4_43s3a")
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="BackGroundNovo"]
+clip_contents = true
+custom_minimum_size = Vector2(816, 1280)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -810.5
+offset_top = -1012.0
+offset_right = 5.5
+offset_bottom = 268.0
+grow_horizontal = 2
+grow_vertical = 2
+auto_translate = false
+stream = ExtResource("4_xvgvt")
+autoplay = true
+
+[node name="tmrSplash" type="Timer" parent="."]
+wait_time = 2.9
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="tmrSplash" to="." method="_on_tmr_splash_timeout"]

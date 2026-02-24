@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://cc48s37eq1cp7"]
+
+[ext_resource type="Script" path="res://Scripts/001_Splash.gd" id="1_yhgn7"]
+[ext_resource type="Texture2D" uid="uid://5myf7ne0e2f" path="res://Assets/000_Geral/LOGO-INTERPLAY 1.png" id="2_ufcye"]
+[ext_resource type="Texture2D" uid="uid://dwrhesm4pwbjp" path="res://Assets/000_Geral/Base.png" id="3_wmb4j"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_8m44y"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_wfyjg"]
+
+[node name="ScnSplash" type="Node2D"]
+script = ExtResource("1_yhgn7")
+
+[node name="BG" type="TextureRect" parent="."]
+material = SubResource("CanvasItemMaterial_8m44y")
+offset_right = 720.0
+offset_bottom = 1280.0
+texture = SubResource("CanvasTexture_wfyjg")
+
+[node name="Logo-interplay1" type="Sprite2D" parent="."]
+position = Vector2(360, 536)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_ufcye")
+
+[node name="Base" type="Sprite2D" parent="."]
+position = Vector2(360, 1088)
+scale = Vector2(0.962667, 0.978803)
+texture = ExtResource("3_wmb4j")
+
+[node name="tmrSplash" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="tmrSplash" to="." method="_on_tmr_splash_timeout"]
