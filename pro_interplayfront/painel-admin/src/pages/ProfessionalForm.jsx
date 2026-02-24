@@ -51,10 +51,10 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex justify-center items-start p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-surface rounded-2xl shadow-xl w-full max-w-md max-h-[calc(100vh-80px)] overflow-auto relative p-6 flex flex-col gap-4"
-      >
+    <form
+      onSubmit={handleSubmit}
+      className="bg-surface rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto relative p-8"
+    >
         {/* Botão de fechar */}
         <button
           type="button"
@@ -68,11 +68,11 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
           {professional ? "Editar Profissional" : "Novo Profissional"}
         </h3>
 
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Campos de criação */}
           {!professional && (
             <>
-              <div className="flex flex-col">
+              <div className="flex flex-col md:col-span-1">
                 <label className="mb-1 font-medium text-theme">Email</label>
                 <input
                   type="email"
@@ -84,7 +84,7 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
                 />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col md:col-span-1">
                 <label className="mb-1 font-medium text-theme">Senha</label>
                 <input
                   type="password"
@@ -99,7 +99,7 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
           )}
 
           {/* Dropdown */}
-          <div className="flex flex-col">
+          <div className="flex flex-col md:col-span-2">
             <label className="mb-1 font-medium text-theme">Nível de acesso</label>
             <select
               name="role"
@@ -116,7 +116,7 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
 
           {/* Outros campos */}
           {["code", "name", "cpf", "address"].map((field) => (
-            <div key={field} className="flex flex-col">
+            <div key={field} className="flex flex-col md:col-span-1">
               <label className="mb-1 font-medium text-theme">
                 {field === "code"
                   ? "Código"

@@ -454,7 +454,7 @@ func EnviarAtividade():
 	var img = viewport.get_texture().get_image()
 
 	# Corrige a orientação da imagem
-	img.flip_y()
+	#img.flip_y()
 
 	# Reduz a imagem para tamanho seguro (ajuste conforme necessário)
 	var max_width = 800

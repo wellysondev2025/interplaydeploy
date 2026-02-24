@@ -107,7 +107,9 @@ const PatientDetails = ({ patient, onBack, onSelectSession }) => (
         />
         <div>
           <h2 className="text-xl font-semibold text-gray-800">{patient.name}</h2>
-          <p className="text-sm text-gray-500">{patient.sessions.length} sessões registradas</p>
+          <p className="text-sm text-gray-500">
+            {patient.sessions.length} sessões registradas
+          </p>
         </div>
       </div>
 
@@ -121,7 +123,9 @@ const PatientDetails = ({ patient, onBack, onSelectSession }) => (
             <p className="font-medium text-gray-800">
               Sessão • {new Date(session.start_date).toLocaleDateString()}
             </p>
-            <p className="text-sm text-gray-500 mt-2">{session.activities.length} atividades</p>
+            <p className="text-sm text-gray-500 mt-2">
+              {session.activities.length} atividades
+            </p>
           </div>
         ))}
       </div>
@@ -130,62 +134,92 @@ const PatientDetails = ({ patient, onBack, onSelectSession }) => (
 );
 
 // ================= SESSION DETAILS =================
-const SessionDetails = ({ session, onBack, descriptions, setDescriptions, saveDescription, setSession }) => {
+const SessionDetails = ({
+  session,
+  onBack,
+  descriptions,
+  setDescriptions,
+  saveDescription,
+  setSession
+}) => {
   const handleDescriptionChange = (activityId, value) => {
     setDescriptions((prev) => ({ ...prev, [activityId]: value }));
   };
 
   return (
     <>
-      <ActionButton onClick={onBack} variant="secondary">← Voltar</ActionButton>
+      <ActionButton onClick={onBack} variant="secondary">
+        ← Voltar
+      </ActionButton>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
         <h2 className="text-lg font-semibold text-gray-800">
           Sessão • {new Date(session.start_date).toLocaleDateString()}
         </h2>
+
         <div className="flex flex-wrap gap-3 mt-3 text-sm text-gray-600">
           {session.session_type && <span>Tipo: {session.session_type}</span>}
           {session.time_session && <span>Duração: {session.time_session} min</span>}
           {session.finally_session ? (
-            <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Finalizada</span>
+            <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">
+              Finalizada
+            </span>
           ) : (
-            <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Em andamento</span>
+            <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">
+              Em andamento
+            </span>
           )}
           {session.version_app && (
-            <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-500 text-xs">v{session.version_app}</span>
+            <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-500 text-xs">
+              v{session.version_app}
+            </span>
           )}
         </div>
 
         <div className="space-y-12 mt-10">
           {session.activities.map((activity) => (
-            <div key={activity.id} className="flex flex-col md:flex-row gap-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-
+            <div
+              key={activity.id}
+              className="flex flex-col md:flex-row gap-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
+            >
               {/* Imagem */}
-              <div className="md:w-1/2 flex items-center justify-center rounded-xl overflow-hidden bg-gray-50">
+              <div className="md:flex-1 flex items-start justify-center rounded-xl overflow-hidden bg-gray-50">
                 {activity.image_url ? (
                   <img
                     src={activity.image_url}
                     alt={activity.cod_activity}
-                    className="w-full h-full object-contain"
+                    className="w-full h-auto max-h-64 object-contain"
                   />
                 ) : (
-                  <div className="h-64 flex items-center justify-center text-gray-400">Sem imagem</div>
+                  <div className="h-64 flex items-center justify-center text-gray-400">
+                    Sem imagem
+                  </div>
                 )}
               </div>
 
               {/* Informações */}
-              <div className="md:w-1/2 flex flex-col justify-between gap-4">
+              <div className="md:flex-1 flex flex-col justify-between gap-6 min-w-0">
                 <div>
-                  <p className="font-medium text-gray-800">{activity.cod_activity}</p>
-                  <p className="text-sm text-gray-500">Duração: {activity.duration || 0}s</p>
+                  <h3 className="text-2xl font-semibold text-gray-900 tracking-tight">
+                    {activity.cod_activity}
+                  </h3>
 
-                  {/* Observação/descrição sempre visível */}
-                  <p className="mt-2 text-sm text-gray-700">
-                    {activity.description?.text || "Sem observação"}
-                  </p>
+                  <div className="flex items-center gap-3 mt-3">
+                    <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                      Duração: {activity.duration || 0}s
+                    </span>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <div className="max-h-52 overflow-hidden pr-2">
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-all">
+                        {activity.description?.text || "Sem observação"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Botão de editar/adicionar descrição */}
+                {/* Botões */}
                 {!activity.editing ? (
                   <ActionButton
                     onClick={() => {
@@ -206,12 +240,20 @@ const SessionDetails = ({ session, onBack, descriptions, setDescriptions, saveDe
                   </ActionButton>
                 ) : (
                   <>
-                    <textarea
-                      value={descriptions[activity.id] ?? ""}
-                      onChange={(e) => handleDescriptionChange(activity.id, e.target.value)}
-                      placeholder="Adicionar descrição da atividade..."
-                      className="w-full min-h-[120px] p-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition"
-                    />
+                  <textarea
+                    maxLength={300}
+                    value={descriptions[activity.id] ?? ""}
+                    onChange={(e) =>
+                      handleDescriptionChange(activity.id, e.target.value)
+                    }
+                    placeholder="Adicionar descrição da atividade..."
+                    className="w-full min-h-[120px] p-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition"
+                  />
+
+                  <p className="text-xs text-gray-400 mt-1 text-right">
+                    {(descriptions[activity.id] ?? "").length}/300 caracteres
+                  </p>
+
                     <div className="flex gap-2 mt-2">
                       <ActionButton
                         onClick={async () => {
@@ -221,14 +263,24 @@ const SessionDetails = ({ session, onBack, descriptions, setDescriptions, saveDe
                               ...prev,
                               activities: prev.activities.map((a) =>
                                 a.id === activity.id
-                                  ? { ...a, editing: false, description: { text: descriptions[activity.id] } }
+                                  ? {
+                                      ...a,
+                                      editing: false,
+                                      description: {
+                                        text: descriptions[activity.id],
+                                      },
+                                    }
                                   : a
                               ),
                             }));
-                            toast.success("Descrição salva com sucesso!", { duration: 3000 });
+                            toast.success("Descrição salva com sucesso!", {
+                              duration: 3000,
+                            });
                           } catch (err) {
                             console.error(err);
-                            toast.error("Erro ao salvar descrição", { duration: 3000 });
+                            toast.error("Erro ao salvar descrição", {
+                              duration: 3000,
+                            });
                           }
                         }}
                         variant="primary"
@@ -241,7 +293,9 @@ const SessionDetails = ({ session, onBack, descriptions, setDescriptions, saveDe
                           setSession((prev) => ({
                             ...prev,
                             activities: prev.activities.map((a) =>
-                              a.id === activity.id ? { ...a, editing: false } : a
+                              a.id === activity.id
+                                ? { ...a, editing: false }
+                                : a
                             ),
                           }));
                         }}
@@ -310,7 +364,10 @@ export default function PacientesPage() {
   if (!activePatient)
     return (
       <DashboardLayout title="Pacientes">
-        <PacientesTable patients={patients} onSelectPatient={setActivePatient} />
+        <PacientesTable
+          patients={patients}
+          onSelectPatient={setActivePatient}
+        />
       </DashboardLayout>
     );
 
