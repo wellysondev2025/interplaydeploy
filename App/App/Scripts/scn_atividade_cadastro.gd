@@ -61,7 +61,7 @@ func validar_profissional(code: String):
 		print("Erro: http_validate não definido")
 		return
 	
-	var url = "http://127.0.0.1:8000/api/game/professional/validate/"
+	var url = "https://interplay-backend.onrender.com/api/game/professional/validate/"
 	var payload = {"code": code}
 	var req_headers = ["Content-Type: application/json"]
 	var body = JSON.stringify(payload)
@@ -86,7 +86,7 @@ func _on_http_request_validate_professional_request_completed(result, response_c
 			print("Erro: http_buscar_hash não definido")
 			return
 		
-		var url = "http://127.0.0.1:8000/api/game/patient/get/"
+		var url = "https://interplay-backend.onrender.com/api/game/patient/get/"
 		var payload = {"hash": InterplayController.PatientID}
 		var json_string = JSON.stringify(payload)
 		var req_headers = ["Content-Type: application/json"]
@@ -111,7 +111,7 @@ func _on_tbx_inicio_pressed():
 			print("Erro: http_create_patient não definido")
 			return
 		
-		var url = "http://127.0.0.1:8000/api/game/patient/create/"
+		var url = "https://interplay-backend.onrender.com/api/game/patient/create/"
 		var payload = {
 			"date_nasc": data_nasc,
 			"name": tbxNome.text.strip_edges(),
@@ -151,7 +151,7 @@ func start_session():
 		print("Erro: http_session_create não definido")
 		return
 	
-	var url = "http://127.0.0.1:8000/api/game/session/create/"
+	var url = "https://interplay-backend.onrender.com/api/game/session/create/"
 	var payload = {
 		"session_type": "CDL 001",
 		"version_app": InterplayController.Version,
