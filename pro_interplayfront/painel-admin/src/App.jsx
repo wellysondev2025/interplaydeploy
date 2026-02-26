@@ -1,14 +1,16 @@
+// src/App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Professionals from "./pages/Professionals";
-import PacientesPage from "./pages/PacientesPage";
+import Login from "@/features/auth/pages/Login";
+import Dashboard from "@/features/dashboard/pages/Dashboard";
+import Professionals from "@/features/professionals/pages/Professionals";
+import PacientesPage from "@/features/patients/pages/PacientesPage";
 
-import { AuthProvider } from "./contexts/AuthContext";
-import PrivateRoute from "./routes/PrivateRoute";
+import { AuthProvider } from "@/contexts/AuthContext";
+import PrivateRoute from "@/routes/PrivateRoute";
 import { Toaster } from "react-hot-toast";
 import { useState, useEffect } from "react";
+
 
 export default function App() {
 

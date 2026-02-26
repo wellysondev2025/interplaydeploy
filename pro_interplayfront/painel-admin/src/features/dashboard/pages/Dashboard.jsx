@@ -1,6 +1,7 @@
+// src/features/dashboard/pages/Dashboard.jsx
 import React, { useState, useEffect } from "react";
-import api from "../services/api";
-import DashboardLayout from "../layouts/DashboardLayout";
+import api from "@/services/api";
+import DashboardLayout from "@/layouts/DashboardLayout";
 
 /* =====================
    FUNÇÃO DE FORMATAÇÃO DE TEMPO

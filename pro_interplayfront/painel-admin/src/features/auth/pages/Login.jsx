@@ -1,9 +1,10 @@
+// src/features/auth/pages/Login.jsx
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import bgImage from "../assets/bg.jpg";
-import logoLogin from "../assets/logologin.svg";
-import api from "../services/api";
-import { useAuth } from "../contexts/AuthContext";
+import bgImage from "@/assets/bg.jpg";
+import logoLogin from "@/assets/logologin.svg";
+import api from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 
 export default function Login() {

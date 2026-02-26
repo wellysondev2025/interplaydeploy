@@ -1,4 +1,4 @@
-import semFoto from '../assets/semfoto.svg';
+import semFoto from "@/assets/semfoto.svg";
 
 export default function ProfessionalCard({
   professional,

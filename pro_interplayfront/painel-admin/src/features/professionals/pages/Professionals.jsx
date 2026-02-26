@@ -1,9 +1,10 @@
+// src/features/professionals/pages/Professionals.jsx
 import { useEffect, useState } from "react";
-import DashboardLayout from "../layouts/DashboardLayout";
-import ProfessionalsList from "./ProfessionalsList";
-import ProfessionalForm from "./ProfessionalForm";
-import api from "../services/api";
-import useUser from "../hooks/useUser";
+import DashboardLayout from "@/layouts/DashboardLayout";
+import ProfessionalsList from "@/features/professionals/components/ProfessionalList";
+import ProfessionalForm from "@/features/professionals/components/ProfessionalForm";
+import api from "@/services/api";
+import useUser from "@/hooks/useUser";
 
 export default function Professionals() {
   const [professionals, setProfessionals] = useState([]);

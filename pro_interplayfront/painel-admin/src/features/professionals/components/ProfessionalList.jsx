@@ -1,4 +1,4 @@
-import ProfessionalCard from "./ProfessionalCard";
+import ProfessionalCard from "@/features/professionals/components/ProfessionalCard";
 
 export default function ProfessionalsList({
   professionals = [],
