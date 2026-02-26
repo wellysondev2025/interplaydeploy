@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from django.conf import settings
 
 
 class IsSuperUser(BasePermission):
@@ -48,3 +49,14 @@ class IsOwnerProfessionalOrSuperUser(BasePermission):
             return False
 
         return obj == professional
+
+
+class GameAPIKeyPermission(BasePermission):
+    """
+    Permite acesso apenas se a API Key enviada no header
+    for igual à configurada no servidor.
+    """
+
+    def has_permission(self, request, view):
+        api_key = request.headers.get("X-API-KEY")
+        return api_key == settings.GAME_API_KEY

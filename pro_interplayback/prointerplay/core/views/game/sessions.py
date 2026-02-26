@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from core.views.game.game_base import GameAPIView
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -9,12 +9,11 @@ from django.utils.decorators import method_decorator
 
 
 from core.models import Session, Patient
-from core.serializers import SessionSerializer
+from core.serializers.game import SessionSerializer
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class SessionCreateView(APIView):
-    permission_classes = [AllowAny]
+class SessionCreateView(GameAPIView):
 
     def post(self, request):
         version_app = request.data.get('version_app', '')
@@ -36,8 +35,7 @@ class SessionCreateView(APIView):
 
     
     
-class SessionFinalizeView(APIView):
-    permission_classes = [AllowAny]
+class SessionFinalizeView(GameAPIView):
 
     def post(self, request):
         session_hash = request.data.get('session_hash')

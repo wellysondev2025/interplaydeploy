@@ -1,13 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
 from core.models import Patient, Professional
+from core.views.game.game_base import GameAPIView
 
 
-class PatientCreateView(APIView):
-    permission_classes = [AllowAny]
-
+class PatientCreateView(GameAPIView):
     def post(self, request):
         name = request.data.get("name")
         date_nasc = request.data.get("date_nasc")
@@ -30,8 +28,7 @@ class PatientCreateView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
-class PatientGetByHashView(APIView):
-    permission_classes = [AllowAny]
+class PatientGetByHashView(GameAPIView):
 
     def post(self, request):
         hash_patient = request.data.get("hash")
@@ -44,8 +41,8 @@ class PatientGetByHashView(APIView):
             return Response({"success": False, "error": "Paciente não encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
 
-class ProfessionalValidateView(APIView):
-    permission_classes = [AllowAny]
+class ProfessionalValidateView(GameAPIView):
+
     def post(self, request):
         code = request.data.get("code")
         if not code:

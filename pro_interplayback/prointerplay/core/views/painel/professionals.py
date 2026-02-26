@@ -1,6 +1,6 @@
 from rest_framework import generics
 from core.models import Professional
-from core.serializers import ProfessionalSerializer, ProfessionalCreateSerializer
+from core.serializers.painel.professionals import ProfessionalSerializer, ProfessionalCreateSerializer
 from core.permissions import (
     IsSuperUser,
     IsOwnerProfessionalOrSuperUser

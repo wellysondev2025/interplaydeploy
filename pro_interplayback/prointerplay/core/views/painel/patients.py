@@ -4,8 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import Prefetch
 
-from core.models import Patient, Session, Activity, Description
-
+from core.models import Patient, Session, Activity
 
 
 class PatientListView(APIView):
@@ -36,21 +35,22 @@ class PatientListView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 2️⃣ Prefetch otimizado
+        # 2️⃣ Query otimizada corretamente para OneToOne
         patients = patients.select_related("professional").prefetch_related(
             Prefetch(
                 "sessions",
                 queryset=Session.objects.prefetch_related(
                     Prefetch(
                         "activities",
-                        queryset=Activity.objects.prefetch_related("description")
+                        queryset=Activity.objects.select_related("description")
                     )
                 ).order_by("-start_date")
             )
         )
 
-        # 3️⃣ Construindo resultado seguro
+        # 3️⃣ Construindo resultado
         result = []
+
         for patient in patients:
             prof = patient.professional
             sessions_list = []
@@ -59,9 +59,16 @@ class PatientListView(APIView):
                 activities_list = []
 
                 for activity in session.activities.all():
-                    desc = getattr(activity, "description", None)
+
+                    # 🔹 Acesso seguro ao OneToOne
+                    if hasattr(activity, "description"):
+                        description_text = activity.description.description
+                    else:
+                        description_text = ""
+
+                    # 🔹 IMAGEM NÃO ALTERADA
                     image_url = None
-                    if getattr(activity, "image", None):
+                    if activity.image:
                         image_url = request.build_absolute_uri(activity.image.url)
 
                     activities_list.append({
@@ -70,7 +77,7 @@ class PatientListView(APIView):
                         "duration": activity.duration,
                         "image_url": image_url,
                         "hash": activity.hash,
-                        "description": desc.description if desc else ""
+                        "description": description_text
                     })
 
                 sessions_list.append({
@@ -99,4 +106,7 @@ class PatientListView(APIView):
                 "sessions": sessions_list
             })
 
-        return Response({"success": True, "patients": result}, status=status.HTTP_200_OK)
+        return Response(
+            {"success": True, "patients": result},
+            status=status.HTTP_200_OK
+        )

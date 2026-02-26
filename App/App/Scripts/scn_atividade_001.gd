@@ -484,7 +484,10 @@ func EnviarAtividade():
 
 	# Envia para a API
 	var url = InterplayController.ApiRoot + "game/activity/create/"
-	var headers = ["Content-Type: application/json"]
+	var headers = [
+		"Content-Type: application/json",
+		"X-API-KEY: sua_chave_super_secreta_local"
+		]
 	var body = JSON.stringify(payload)
 
 	$HTTPRequest_CreateActivity.timeout = 15
