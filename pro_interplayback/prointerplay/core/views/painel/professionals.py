@@ -1,78 +1,75 @@
+# core/views/painel/professionals.py
 from rest_framework import generics
-from core.models import Professional
-from core.serializers.painel.professionals import ProfessionalSerializer, ProfessionalCreateSerializer
-from core.permissions import (
-    IsSuperUser,
-    IsOwnerProfessionalOrSuperUser
-)
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from core.permissions import IsOwnerProfessionalOrSuperUser, IsOrganizationAdminOrSuperUser
 
-from rest_framework.response import Response
-from rest_framework import status
-import traceback
+from core.models import Professional
+from core.serializers.painel.professionals import ProfessionalSerializer, ProfessionalCreateSerializer
 
 
-@method_decorator(csrf_exempt, name='dispatch')  # ⚡ Ignora CSRF temporariamente para Postman
+@method_decorator(csrf_exempt, name='dispatch')
 class ProfessionalListCreateView(generics.ListCreateAPIView):
     """
-    Apenas SuperUser pode listar ou criar profissionais.
+    - Superuser: vê/cria qualquer profissional.
+    - Organization Admin: vê/cria profissionais da própria organização.
+    - Profissional isolado: não pode listar/criar.
     """
-    queryset = Professional.objects.all()
     serializer_class = ProfessionalSerializer
-    permission_classes = [IsSuperUser]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Professional.objects.all()
+        elif user.organization_admin and user.organization:
+            return Professional.objects.filter(organization=user.organization)
+        elif hasattr(user, "professional_profile"):
+            return Professional.objects.filter(user=user)
+        return Professional.objects.none()
 
     def get_serializer_class(self):
         if self.request.method == "POST":
             return ProfessionalCreateSerializer
         return ProfessionalSerializer
-    
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-            prof = serializer.save()
-            print("Professional criado:", prof)
-            return Response(
-                {"success": True, "professional": ProfessionalSerializer(prof).data},
-                status=status.HTTP_201_CREATED
-            )
-        except Exception as e:
-            traceback_str = traceback.format_exc()
-            print("ERRO criando professional:", traceback_str)
-            return Response(
-                {"success": False, "error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
+    def get_permissions(self):
+        """
+        Define permissões DRF para criar/listar profissionais.
+        """
+        return [IsOrganizationAdminOrSuperUser()]
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ProfessionalRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     """
     GET:
-        - SuperUser pode ver qualquer profissional.
-        - Professional pode ver apenas o próprio perfil.
+        - Superuser vê qualquer profissional.
+        - Organization Admin vê profissionais da própria organização.
+        - Profissional isolado vê apenas o próprio perfil.
 
     PUT/PATCH/DELETE:
-        - Apenas SuperUser pode alterar ou deletar.
+        - Superuser pode alterar qualquer profissional.
+        - Organization Admin pode alterar profissionais da própria organização.
+        - Profissional isolado não pode alterar.
     """
-    queryset = Professional.objects.all()
     serializer_class = ProfessionalSerializer
-
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [IsOwnerProfessionalOrSuperUser()]
-        return [IsSuperUser()]
+    queryset = Professional.objects.all()
 
     def get_queryset(self):
         user = self.request.user
-
         if user.is_superuser:
             return Professional.objects.all()
-
-        if hasattr(user, "professional_profile"):
+        elif user.organization_admin and user.organization:
+            return Professional.objects.filter(organization=user.organization)
+        elif hasattr(user, "professional_profile"):
             return Professional.objects.filter(user=user)
-
         return Professional.objects.none()
 
-    def put(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
+    def get_permissions(self):
+        """
+        Para GET: permite superuser ou owner.
+        Para PUT/PATCH/DELETE: permite superuser ou org admin.
+        """
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+            return [IsOrganizationAdminOrSuperUser()]
+        return [IsOwnerProfessionalOrSuperUser()]

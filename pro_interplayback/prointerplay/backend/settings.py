@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "organizations",
     "core",
     "users",
-
     "cloudinary",
     "cloudinary_storage",    
 ]

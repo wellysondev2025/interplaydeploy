@@ -60,3 +60,21 @@ class GameAPIKeyPermission(BasePermission):
     def has_permission(self, request, view):
         api_key = request.headers.get("X-API-KEY")
         return api_key == settings.GAME_API_KEY
+    
+
+class IsOrganizationAdminOrSuperUser(BasePermission):
+    """
+    Permite acesso se o usuário for superuser ou admin da própria organização.
+    """
+    def has_object_permission(self, request, view, obj):
+        if not request.user.is_authenticated:
+            return False
+
+        if request.user.is_superuser:
+            return True
+
+        if request.user.organization_admin and request.user.organization:
+            # obj pode ser Professional ou Patient
+            return getattr(obj, "organization", None) == request.user.organization
+
+        return False
