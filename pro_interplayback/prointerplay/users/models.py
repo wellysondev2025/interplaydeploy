@@ -15,6 +15,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
+        extra_fields.setdefault("organization_admin", False)  # padrão: não admin
 
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -25,6 +26,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("organization_admin", True)  # superuser é admin global
 
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser precisa ter is_superuser=True.")
@@ -44,15 +46,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    # ✅ NOVO CAMPO: define se é admin da organização
+    organization_admin = models.BooleanField(default=False)
 
+    # Vinculação à organização (pode ser None para profissionais isolados)
     organization = models.ForeignKey(
-    Organization,
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name="users"
-)
+        Organization,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="users"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     objects = UserManager()
 

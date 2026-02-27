@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "name",
+            "organization_admin"
             "is_staff",
             "is_superuser",
         ]

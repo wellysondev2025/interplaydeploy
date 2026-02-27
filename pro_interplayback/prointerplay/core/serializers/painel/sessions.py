@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core.models import Session
-from .activities import ActivityPainelSerializer
+from core.serializers.painel.activities import ActivityPainelSerializer
 
 class SessionPainelSerializer(serializers.ModelSerializer):
     activities = ActivityPainelSerializer(many=True, read_only=True)

@@ -57,6 +57,7 @@ class DescriptionUpdateView(APIView):
 
         description, _ = Description.objects.get_or_create(activity=activity)
         description.description = description_text
+        print(description)
         description.save()
 
         return Response({

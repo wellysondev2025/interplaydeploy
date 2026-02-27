@@ -5,5 +5,11 @@ from core.models import Activity
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ['id', 'session', 'cod_activity', 'end_date_activity',
-                  'image', 'duration', 'hash']
+        fields = [
+            'id',
+            'session',
+            'cod_activity',
+            'end_date_activity',
+            'image',
+            'duration',
+            'hash']
