@@ -98,22 +98,6 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
             </>
           )}
 
-          {/* Dropdown */}
-          <div className="flex flex-col md:col-span-2">
-            <label className="mb-1 font-medium text-theme">Nível de acesso</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              className="input-theme rounded-lg px-3 py-2 w-full"
-            >
-              <option value="">Selecione o nível</option>
-              <option value="admin">Admin (privilégios totais)</option>
-              <option value="user">Usuário normal</option>
-            </select>
-          </div>
-
           {/* Outros campos */}
           {["code", "name", "cpf", "address"].map((field) => (
             <div key={field} className="flex flex-col md:col-span-1">

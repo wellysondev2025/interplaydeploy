@@ -1,10 +1,20 @@
 # organizations/views.py
+
 from rest_framework import viewsets
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
+from core.permissions import IsSuperUser
 from .models import Organization
 from .serializers import OrganizationSerializer
 
+
 class OrganizationViewSet(viewsets.ModelViewSet):
-    queryset = Organization.objects.all()
+    """
+    CRUD completo de Organization.
+    Acesso exclusivo para SUPERUSER.
+    """
+
     serializer_class = OrganizationSerializer
-    permission_classes = [IsAdminUser]  # Apenas admins globais podem criar/editar
+    permission_classes = [IsAuthenticated, IsSuperUser]
+
+    def get_queryset(self):
+        return Organization.objects.all()

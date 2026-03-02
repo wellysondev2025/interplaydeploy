@@ -5,11 +5,19 @@ from django.utils.decorators import method_decorator
 from core.permissions import IsOwnerProfessionalOrSuperUser, IsProfessionalCreateAllowed, IsProfessionalAccessAllowed,IsOrganizationAdminOrSuperUser
 
 from core.models import Professional
-from core.serializers.painel.professionals import ProfessionalSerializer, ProfessionalCreateSerializer
+from core.serializers.painel.professionals import ProfessionalSerializer,ProfessionalCreateSerializer
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class ProfessionalListCreateView(generics.ListCreateAPIView):
+
+    queryset = Professional.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return ProfessionalCreateSerializer
+        return ProfessionalSerializer
 
     def get_queryset(self):
         user = self.request.user
@@ -35,10 +43,8 @@ class ProfessionalListCreateView(generics.ListCreateAPIView):
         if user.role == user.Role.SUPERUSER:
             serializer.save()
         else:
-            # força organização do admin
-            serializer.save(
-                user__organization=user.organization
-            )
+            serializer.save()
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProfessionalRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -60,7 +66,7 @@ class ProfessionalRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
         user = self.request.user
         if user.is_superuser:
             return Professional.objects.all()
-        elif user.organization_admin and user.organization:
+        elif user.role == user.Role.ORG_ADMIN:
             return Professional.objects.filter(organization=user.organization)
         elif hasattr(user, "professional_profile"):
             return Professional.objects.filter(user=user)

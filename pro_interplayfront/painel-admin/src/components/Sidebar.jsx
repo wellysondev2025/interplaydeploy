@@ -58,7 +58,7 @@ export default function Sidebar({ menuOpen, setMenuOpen }) {
               />
 
               {/* PROFISSIONAIS (admin) */}
-              {user?.admin && (
+              {(user?.role === "superuser" || user?.role === "org_admin") && (
                 <SidebarButton
                   label="👨‍⚕️ Profissionais"
                   onClick={() => navigate("/professionals")}

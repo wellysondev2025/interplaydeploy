@@ -3,8 +3,13 @@ import { useEffect, useState } from "react";
 export default function Header({ title, onMenuClick }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const isAdmin = user?.admin || user?.super_user;
-  const professionalCode = user?.professional?.code;
+  const isSuperuser = user?.role === "superuser";
+  const isOrgAdmin = user?.role === "org_admin";
+  const isProfessional = user?.role === "professional";
+
+  const isAdmin = isSuperuser || isOrgAdmin;
+
+  const professionalCode = user?.professional_profile?.code;
 
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "theme-pink-luxury"
@@ -109,7 +114,7 @@ export default function Header({ title, onMenuClick }) {
           </span>
         )}
 
-        {!isAdmin && professionalCode && (
+        {isProfessional && professionalCode && (
           <span
             className="
               px-4 py-2

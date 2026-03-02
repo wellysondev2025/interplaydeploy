@@ -35,9 +35,6 @@ export default function Login() {
         // 3️⃣ Salva no contexto
         login(me.data, access, refresh);
 
-        // 4️⃣ Redireciona
-        navigate("/dashboard");
-
         return me.data;
       })(),
       {

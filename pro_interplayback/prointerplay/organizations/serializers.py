@@ -1,7 +1,9 @@
+# organizations/serializers.py
+
 from rest_framework import serializers
 from .models import Organization
 
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = "__all__"
+        fields = ["id", "name", "is_solo"]

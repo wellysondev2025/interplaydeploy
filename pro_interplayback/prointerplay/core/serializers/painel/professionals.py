@@ -15,9 +15,6 @@ class ProfessionalSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
-
-
 class ProfessionalCreateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
@@ -35,19 +32,29 @@ class ProfessionalCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        request = self.context["request"]
+        creator = request.user
+
         email = validated_data.pop("email")
         password = validated_data.pop("password")
 
-        # cria o user
+        # Define organização automaticamente
+        if creator.role == creator.Role.SUPERUSER:
+            organization = creator.organization
+        else:
+            organization = creator.organization
+
+        # Cria o User corretamente
         user = User.objects.create_user(
             email=email,
             password=password,
             name=validated_data["name"],
-            is_staff=False,      # garante que não é staff
-            is_superuser=False   # garante que não é superuser
+            role=User.Role.PROFESSIONAL,
+            organization=organization,
+            is_staff=False,
+            is_superuser=False
         )
 
-        # cria o professional
         professional = Professional.objects.create(
             user=user,
             **validated_data
