@@ -78,3 +78,43 @@ class IsOrganizationAdminOrSuperUser(BasePermission):
             return getattr(obj, "organization", None) == request.user.organization
 
         return False
+
+
+class IsProfessionalAccessAllowed(BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+
+        if not user.is_authenticated:
+            return False
+
+        # Superuser
+        if user.role == user.Role.SUPERUSER:
+            return True
+
+        # Org Admin da mesma organização
+        if (
+            user.role == user.Role.ORG_ADMIN and
+            user.organization == obj.user.organization
+        ):
+            return True
+
+        # Dono do perfil
+        if obj.user == user:
+            return True
+
+        return False
+    
+
+class IsProfessionalCreateAllowed(BasePermission):
+
+    def has_permission(self, request, view):
+        user = request.user
+
+        if not user.is_authenticated:
+            return False
+
+        return user.role in [
+            user.Role.SUPERUSER,
+            user.Role.ORG_ADMIN
+        ]

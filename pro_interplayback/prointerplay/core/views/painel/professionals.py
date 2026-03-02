@@ -2,7 +2,7 @@
 from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from core.permissions import IsOwnerProfessionalOrSuperUser, IsOrganizationAdminOrSuperUser
+from core.permissions import IsOwnerProfessionalOrSuperUser, IsProfessionalCreateAllowed, IsProfessionalAccessAllowed,IsOrganizationAdminOrSuperUser
 
 from core.models import Professional
 from core.serializers.painel.professionals import ProfessionalSerializer, ProfessionalCreateSerializer
@@ -10,34 +10,35 @@ from core.serializers.painel.professionals import ProfessionalSerializer, Profes
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProfessionalListCreateView(generics.ListCreateAPIView):
-    """
-    - Superuser: vê/cria qualquer profissional.
-    - Organization Admin: vê/cria profissionais da própria organização.
-    - Profissional isolado: não pode listar/criar.
-    """
-    serializer_class = ProfessionalSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_superuser:
-            return Professional.objects.all()
-        elif user.organization_admin and user.organization:
-            return Professional.objects.filter(organization=user.organization)
-        elif hasattr(user, "professional_profile"):
-            return Professional.objects.filter(user=user)
-        return Professional.objects.none()
 
-    def get_serializer_class(self):
-        if self.request.method == "POST":
-            return ProfessionalCreateSerializer
-        return ProfessionalSerializer
+        if user.role == user.Role.SUPERUSER:
+            return Professional.objects.all()
+
+        if user.role == user.Role.ORG_ADMIN:
+            return Professional.objects.filter(
+                user__organization=user.organization
+            )
+
+        return Professional.objects.filter(user=user)
 
     def get_permissions(self):
-        """
-        Define permissões DRF para criar/listar profissionais.
-        """
-        return [IsOrganizationAdminOrSuperUser()]
+        if self.request.method == "POST":
+            return [IsProfessionalCreateAllowed()]
+        return [IsProfessionalAccessAllowed()]
 
+    def perform_create(self, serializer):
+        user = self.request.user
+
+        if user.role == user.Role.SUPERUSER:
+            serializer.save()
+        else:
+            # força organização do admin
+            serializer.save(
+                user__organization=user.organization
+            )
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProfessionalRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):

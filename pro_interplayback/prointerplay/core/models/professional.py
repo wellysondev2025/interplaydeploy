@@ -10,15 +10,6 @@ class Professional(models.Model):
         related_name="professional_profile"
     )
 
-    # ✅ NOVO CAMPO: vincula o profissional a uma clínica
-    organization = models.ForeignKey(
-        Organization,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="professionals"
-    )
-
     code = models.CharField(max_length=20, unique=True)
     cpf = models.CharField(max_length=11, unique=True, null=True, blank=True)
 
