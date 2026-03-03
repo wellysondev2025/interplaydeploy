@@ -1,4 +1,3 @@
-// src/features/professionals/pages/Professionals.jsx
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import ProfessionalsList from "@/features/professionals/components/ProfessionalList";
@@ -16,15 +15,18 @@ export default function Professionals() {
   const { user, loading: loadingUser } = useUser();
 
   useEffect(() => {
-    if (user?.is_superuser) loadProfessionals();
-    else setLoadingProfessionals(false);
+    if (user) loadProfessionals();
   }, [user]);
 
   async function loadProfessionals() {
     setLoadingProfessionals(true);
     setError(null);
     try {
-      const res = await api.get("painel/professionals/");
+      // ORG_ADMIN deve listar apenas profissionais da sua organização
+      const endpoint = user?.is_superuser
+        ? "painel/professionals/"
+        : `painel/professionals/?organization=${user.organization.id}`;
+      const res = await api.get(endpoint);
       setProfessionals(res.data);
     } catch (err) {
       console.error("Erro ao carregar profissionais:", err);
@@ -64,7 +66,7 @@ export default function Professionals() {
     );
   }
 
-  if (!user?.is_superuser) {
+  if (!user) {
     return (
       <DashboardLayout title="Profissionais">
         <p className="p-6 text-muted">
@@ -76,9 +78,8 @@ export default function Professionals() {
 
   return (
     <DashboardLayout title="Profissionais">
-      {/* Container principal */}
       <div className="bg-surface backdrop-blur rounded-3xl shadow-xl p-8">
-        {/* Cabeçalho da página */}
+        {/* Cabeçalho */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h2 className="text-2xl font-bold card-pro-title">
@@ -89,31 +90,31 @@ export default function Professionals() {
             </p>
           </div>
 
-          <button
-            onClick={() => {
-              setEditProfessional(null);
-              setOpenForm(true);
-            }}
-            style={{
-              background: "var(--gradient-horizontal)",
-              color: "var(--btn-primary-text)"
-            }}
-            className="
-              px-6 py-2.5
-              rounded-xl
-              font-medium
-              hover:opacity-90
-              transition
-              shadow-md
-            "
-          >
-            + Novo Profissional
-          </button>
+          {(user.is_superuser || user.role === "org_admin") && (
+            <button
+              onClick={() => {
+                setEditProfessional(null);
+                setOpenForm(true);
+              }}
+              style={{
+                background: "var(--gradient-horizontal)",
+                color: "var(--btn-primary-text)"
+              }}
+              className="
+                px-6 py-2.5
+                rounded-xl
+                font-medium
+                hover:opacity-90
+                transition
+                shadow-md
+              "
+            >
+              + Novo Profissional
+            </button>
+          )}
         </div>
 
-        {error && (
-          <p className="text-red-500 mb-6">{error}</p>
-        )}
+        {error && <p className="text-red-500 mb-6">{error}</p>}
 
         {/* Lista */}
         <div className="px-0 sm:px-2">
@@ -121,7 +122,7 @@ export default function Professionals() {
             professionals={professionals}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            canEdit={user.is_superuser}
+            user={user} // ⚡ passa user logado para controlar edição dentro do card
           />
         </div>
 
@@ -129,6 +130,7 @@ export default function Professionals() {
         {openForm && (
           <ProfessionalForm
             professional={editProfessional}
+            user={user} // ⚡ passa user logado para controlar role e criação
             onClose={() => setOpenForm(false)}
             onSave={handleSave}
           />

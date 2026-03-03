@@ -4,7 +4,7 @@ export default function ProfessionalsList({
   professionals = [],
   onEdit,
   onDelete,
-  canEdit
+  user, // usuário logado passado do parent
 }) {
   if (professionals.length === 0) {
     return (
@@ -15,22 +15,14 @@ export default function ProfessionalsList({
   }
 
   return (
-    <div
-      className="
-        grid
-        grid-cols-1
-        sm:grid-cols-2
-        xl:grid-cols-3
-        gap-6
-      "
-    >
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
       {professionals.map((prof) => (
         <ProfessionalCard
           key={prof.id}
           professional={prof}
           onEdit={() => onEdit(prof)}
           onDelete={() => onDelete(prof.id)}
-          canEdit={canEdit}
+          user={user} // passa o usuário logado
         />
       ))}
     </div>

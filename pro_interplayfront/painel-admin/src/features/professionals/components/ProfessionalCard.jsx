@@ -4,11 +4,15 @@ export default function ProfessionalCard({
   professional,
   onEdit,
   onDelete,
-  canEdit,
+  user, // usuário logado passado do parent
 }) {
+  // Determina se pode editar/deletar
+  const canEdit =
+    user?.is_superuser ||
+    (user?.role === "org_admin" && professional?.organization === user.organization);
+
   return (
     <div className="card-pro rounded-xl shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
-      
       {/* Header / Avatar */}
       <div className="h-28 w-full card-pro-header overflow-hidden flex items-center justify-center">
         <img
@@ -33,9 +37,7 @@ export default function ProfessionalCard({
         )}
 
         {professional?.address && (
-          <p className="text-xs text-muted truncate">
-            📍 {professional.address}
-          </p>
+          <p className="text-xs text-muted truncate">📍 {professional.address}</p>
         )}
 
         {canEdit && (

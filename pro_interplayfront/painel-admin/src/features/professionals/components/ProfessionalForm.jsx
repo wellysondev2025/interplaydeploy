@@ -1,13 +1,13 @@
 import { useState } from "react";
 import api from "@/services/api";
 
-export default function ProfessionalForm({ professional, onClose, onSave }) {
+export default function ProfessionalForm({ professional, user, onClose, onSave }) {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const [formData, setFormData] = useState({
     email: professional?.user?.email || "",
     password: "",
-    role: professional?.role || "",
+    role: professional?.role || "professional",
     code: professional?.code || "",
     name: professional?.name || "",
     cpf: professional?.cpf || "",
@@ -23,15 +23,20 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
     e.preventDefault();
     setLoadingSubmit(true);
 
+    // payload base
     const payload = {
       email: formData.email,
       password: formData.password,
-      role: formData.role,
       code: formData.code,
       name: formData.name,
       cpf: formData.cpf,
       address: formData.address,
     };
+
+    // Se SUPERUSER, pode enviar role
+    if (user?.is_superuser) {
+      payload.role = formData.role;
+    }
 
     try {
       const url = professional
@@ -51,10 +56,10 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex justify-center items-start p-4">
-    <form
-      onSubmit={handleSubmit}
-      className="bg-surface rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto relative p-8"
-    >
+      <form
+        onSubmit={handleSubmit}
+        className="bg-surface rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto relative p-8"
+      >
         {/* Botão de fechar */}
         <button
           type="button"
@@ -98,7 +103,7 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
             </>
           )}
 
-          {/* Outros campos */}
+          {/* Campos do model Professional */}
           {["code", "name", "cpf", "address"].map((field) => (
             <div key={field} className="flex flex-col md:col-span-1">
               <label className="mb-1 font-medium text-theme">
@@ -116,6 +121,18 @@ export default function ProfessionalForm({ professional, onClose, onSave }) {
               />
             </div>
           ))}
+
+          {/* Role apenas para SUPERUSER */}
+          {user?.is_superuser && !professional && (
+            <div className="flex flex-col md:col-span-1">
+              <label className="mb-1 font-medium text-theme">Role</label>
+              <select name="role" value={formData.role} onChange={handleChange}>
+                <option value="superuser">SUPERUSER</option>
+                <option value="org_admin">ORG_ADMIN</option>
+                <option value="professional">PROFESSIONAL</option>
+              </select>
+            </div>
+          )}
 
           {/* Botões */}
           <div className="flex justify-end gap-3 mt-2">
