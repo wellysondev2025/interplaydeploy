@@ -22,11 +22,7 @@ export default function Professionals() {
     setLoadingProfessionals(true);
     setError(null);
     try {
-      // ORG_ADMIN deve listar apenas profissionais da sua organização
-      const endpoint = user?.is_superuser
-        ? "painel/professionals/"
-        : `painel/professionals/?organization=${user.organization.id}`;
-      const res = await api.get(endpoint);
+      const res = await api.get("painel/professionals/");
       setProfessionals(res.data);
     } catch (err) {
       console.error("Erro ao carregar profissionais:", err);
@@ -45,11 +41,11 @@ export default function Professionals() {
   async function handleDelete(id) {
     if (!confirm("Deseja realmente excluir este profissional?")) return;
     try {
-      await api.delete(`/painel/professionals/${id}/`);
+      await api.delete(`painel/professionals/${id}/`);
       loadProfessionals();
     } catch (err) {
       console.error("Erro ao deletar profissional:", err);
-      alert("Erro ao deletar profissional. Tente novamente.");
+      alert("Erro ao deletar profissional.");
     }
   }
 
@@ -76,38 +72,31 @@ export default function Professionals() {
     );
   }
 
+  const canCreate =
+    user.role === "superuser" ||
+    user.role === "org_admin";
+
   return (
-    <DashboardLayout title="Profissionais">
-      <div className="bg-surface backdrop-blur rounded-3xl shadow-xl p-8">
-        {/* Cabeçalho */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+  <DashboardLayout title="Profissionais">
+    <>
+      <div className="bg-surface rounded-3xl shadow-xl p-8">
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl font-bold card-pro-title">
+            <h2 className="text-2xl font-bold">
               Gestão de Profissionais
             </h2>
             <p className="text-sm text-muted">
-              Gerencie os profissionais cadastrados no sistema
+              Gerencie os profissionais cadastrados
             </p>
           </div>
 
-          {(user.is_superuser || user.role === "org_admin") && (
+          {canCreate && (
             <button
               onClick={() => {
                 setEditProfessional(null);
                 setOpenForm(true);
               }}
-              style={{
-                background: "var(--gradient-horizontal)",
-                color: "var(--btn-primary-text)"
-              }}
-              className="
-                px-6 py-2.5
-                rounded-xl
-                font-medium
-                hover:opacity-90
-                transition
-                shadow-md
-              "
+              className="px-6 py-2.5 rounded-xl font-medium shadow-md btn-primary"
             >
               + Novo Profissional
             </button>
@@ -116,26 +105,24 @@ export default function Professionals() {
 
         {error && <p className="text-red-500 mb-6">{error}</p>}
 
-        {/* Lista */}
-        <div className="px-0 sm:px-2">
-          <ProfessionalsList
-            professionals={professionals}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            user={user} // ⚡ passa user logado para controlar edição dentro do card
-          />
-        </div>
-
-        {/* Modal */}
-        {openForm && (
-          <ProfessionalForm
-            professional={editProfessional}
-            user={user} // ⚡ passa user logado para controlar role e criação
-            onClose={() => setOpenForm(false)}
-            onSave={handleSave}
-          />
-        )}
+        <ProfessionalsList
+          professionals={professionals}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          user={user}
+        />
       </div>
-    </DashboardLayout>
-  );
+
+      {/* 🔥 MODAL FORA DO CARD */}
+      {openForm && (
+        <ProfessionalForm
+          professional={editProfessional}
+          user={user}
+          onClose={() => setOpenForm(false)}
+          onSave={handleSave}
+        />
+      )}
+    </>
+  </DashboardLayout>
+);
 }

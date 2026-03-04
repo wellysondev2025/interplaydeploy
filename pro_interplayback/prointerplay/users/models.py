@@ -25,7 +25,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", False)
 
         # Role padrão PROFESSIONAL
-        role = extra_fields.get("role", User.Role.PROFESSIONAL)
+        role = extra_fields.pop("role", User.Role.PROFESSIONAL)
 
         organization = extra_fields.get("organization")
         if not organization:

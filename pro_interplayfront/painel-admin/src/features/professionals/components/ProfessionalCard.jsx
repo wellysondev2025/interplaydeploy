@@ -4,16 +4,14 @@ export default function ProfessionalCard({
   professional,
   onEdit,
   onDelete,
-  user, // usuário logado passado do parent
+  user,
 }) {
-  // Determina se pode editar/deletar
   const canEdit =
-    user?.is_superuser ||
-    (user?.role === "org_admin" && professional?.organization === user.organization);
+    user?.role === "superuser" ||
+    user?.role === "org_admin";
 
   return (
     <div className="card-pro rounded-xl shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
-      {/* Header / Avatar */}
       <div className="h-28 w-full card-pro-header overflow-hidden flex items-center justify-center">
         <img
           src={professional?.avatar || semFoto}
@@ -22,7 +20,6 @@ export default function ProfessionalCard({
         />
       </div>
 
-      {/* Conteúdo */}
       <div className="p-4 flex flex-col gap-3 flex-1">
         <h3 className="text-base font-semibold card-pro-title truncate">
           {professional?.name}
@@ -33,11 +30,15 @@ export default function ProfessionalCard({
         </p>
 
         {professional?.cpf && (
-          <p className="text-xs text-muted truncate">CPF: {professional.cpf}</p>
+          <p className="text-xs text-muted truncate">
+            CPF: {professional.cpf}
+          </p>
         )}
 
         {professional?.address && (
-          <p className="text-xs text-muted truncate">📍 {professional.address}</p>
+          <p className="text-xs text-muted truncate">
+            📍 {professional.address}
+          </p>
         )}
 
         {canEdit && (

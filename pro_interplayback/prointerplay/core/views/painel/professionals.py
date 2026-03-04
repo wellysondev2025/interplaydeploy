@@ -67,7 +67,7 @@ class ProfessionalRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
         if user.is_superuser:
             return Professional.objects.all()
         elif user.role == user.Role.ORG_ADMIN:
-            return Professional.objects.filter(organization=user.organization)
+            return Professional.objects.filter(user__organization=user.organization)
         elif hasattr(user, "professional_profile"):
             return Professional.objects.filter(user=user)
         return Professional.objects.none()

@@ -64,10 +64,7 @@ class IsOwnerProfessionalOrSuperUser(BasePermission):
 
 
 class IsOrganizationAdminOrSuperUser(BasePermission):
-    """
-    SUPERUSER pode acessar qualquer objeto.
-    ORG_ADMIN pode acessar apenas objetos da própria organização.
-    """
+
     def has_object_permission(self, request, view, obj):
         user = request.user
 
@@ -79,13 +76,12 @@ class IsOrganizationAdminOrSuperUser(BasePermission):
 
         if (
             user.role == user.Role.ORG_ADMIN and
-            hasattr(obj, "organization") and
-            obj.organization == user.organization
+            hasattr(obj, "user") and
+            obj.user.organization == user.organization
         ):
             return True
 
         return False
-
 
 class IsProfessionalAccessAllowed(BasePermission):
     """
