@@ -66,47 +66,71 @@ export default function ProfessionalForm({ professional, user, onClose, onSave }
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6">
+    <div className="absolute inset-0 z-40 flex items-center justify-center p-4 sm:p-6">
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
       <form
         onSubmit={handleSubmit}
-        className="bg-surface rounded-2xl shadow-xl w-full max-w-xl p-6"
+        className="
+          relative
+          bg-surface
+          w-full
+          max-w-md
+          sm:max-w-lg
+          rounded-2xl
+          shadow-2xl
+          p-5
+          sm:p-6
+          max-h-[90vh]
+          overflow-y-auto
+        "
       >
+        {/* Botão fechar */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg font-bold"
         >
           ×
         </button>
 
-        <h3 className="text-xl font-bold text-center text-theme">
+        <h3 className="text-lg sm:text-xl font-bold text-center text-theme mb-6">
           {isEdit ? "Editar Profissional" : "Novo Profissional"}
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {!isEdit && (
             <>
               <div className="flex flex-col">
-                <label className="mb-1 font-medium text-theme">Email</label>
+                <label className="mb-1 text-sm font-medium text-theme">
+                  Email
+                </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="input-theme rounded-lg px-3 py-2 w-full"
+                  className="input-theme rounded-lg px-3 py-2 w-full text-sm"
                 />
               </div>
 
               <div className="flex flex-col">
-                <label className="mb-1 font-medium text-theme">Senha</label>
+                <label className="mb-1 text-sm font-medium text-theme">
+                  Senha
+                </label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="input-theme rounded-lg px-3 py-2 w-full"
+                  className="input-theme rounded-lg px-3 py-2 w-full text-sm"
                 />
               </div>
             </>
@@ -114,7 +138,7 @@ export default function ProfessionalForm({ professional, user, onClose, onSave }
 
           {["code", "name", "cpf", "address"].map((field) => (
             <div key={field} className="flex flex-col">
-              <label className="mb-1 font-medium text-theme">
+              <label className="mb-1 text-sm font-medium text-theme">
                 {field.charAt(0).toUpperCase() + field.slice(1)}
               </label>
               <input
@@ -123,19 +147,21 @@ export default function ProfessionalForm({ professional, user, onClose, onSave }
                 value={formData[field]}
                 onChange={handleChange}
                 required
-                className="input-theme rounded-lg px-3 py-2 w-full"
+                className="input-theme rounded-lg px-3 py-2 w-full text-sm"
               />
             </div>
           ))}
 
           {!isEdit && user?.role === "superuser" && (
-            <div className="flex flex-col">
-              <label className="mb-1 font-medium text-theme">Role</label>
+            <div className="flex flex-col md:col-span-2">
+              <label className="mb-1 text-sm font-medium text-theme">
+                Role
+              </label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="input-theme rounded-lg px-3 py-2"
+                className="input-theme rounded-lg px-3 py-2 text-sm"
               >
                 <option value="professional">PROFESSIONAL</option>
                 <option value="org_admin">ORG_ADMIN</option>
@@ -144,19 +170,20 @@ export default function ProfessionalForm({ professional, user, onClose, onSave }
             </div>
           )}
 
-          <div className="flex justify-end gap-3 mt-2 md:col-span-2">
+          <div className="flex justify-end gap-3 mt-4 md:col-span-2">
             <button
               type="button"
               onClick={onClose}
               disabled={loadingSubmit}
-              className="px-4 py-2 rounded-lg btn-secondary"
+              className="px-4 py-2 rounded-lg btn-secondary text-sm"
             >
               Cancelar
             </button>
+
             <button
               type="submit"
               disabled={loadingSubmit}
-              className="px-4 py-2 rounded-lg btn-primary"
+              className="px-4 py-2 rounded-lg btn-primary text-sm"
             >
               {loadingSubmit ? "Salvando..." : "Salvar"}
             </button>

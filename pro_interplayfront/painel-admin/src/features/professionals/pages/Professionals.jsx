@@ -77,52 +77,67 @@ export default function Professionals() {
     user.role === "org_admin";
 
   return (
-  <DashboardLayout title="Profissionais">
-    <>
-      <div className="bg-surface rounded-3xl shadow-xl p-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-2xl font-bold">
-              Gestão de Profissionais
-            </h2>
-            <p className="text-sm text-muted">
-              Gerencie os profissionais cadastrados
-            </p>
+    <DashboardLayout title="Profissionais">
+      <div className="relative">
+        {/* Card principal */}
+        <div className="bg-surface rounded-2xl shadow-lg p-5 sm:p-6 lg:p-8">
+          
+          {/* Header da página */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                Gestão de Profissionais
+              </h2>
+              <p className="text-sm text-muted">
+                Gerencie os profissionais cadastrados
+              </p>
+            </div>
+
+            {canCreate && (
+              <button
+                onClick={() => {
+                  setEditProfessional(null);
+                  setOpenForm(true);
+                }}
+                className="
+                  w-full
+                  sm:w-auto
+                  px-5
+                  py-2.5
+                  rounded-lg
+                  font-medium
+                  btn-primary
+                "
+              >
+                + Novo Profissional
+              </button>
+            )}
           </div>
 
-          {canCreate && (
-            <button
-              onClick={() => {
-                setEditProfessional(null);
-                setOpenForm(true);
-              }}
-              className="px-6 py-2.5 rounded-xl font-medium shadow-md btn-primary"
-            >
-              + Novo Profissional
-            </button>
+          {error && (
+            <div className="mb-4 text-sm text-red-500">
+              {error}
+            </div>
           )}
+
+          <ProfessionalsList
+            professionals={professionals}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            user={user}
+          />
         </div>
 
-        {error && <p className="text-red-500 mb-6">{error}</p>}
-
-        <ProfessionalsList
-          professionals={professionals}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          user={user}
-        />
+        {/* Modal */}
+        {openForm && (
+          <ProfessionalForm
+            professional={editProfessional}
+            user={user}
+            onClose={() => setOpenForm(false)}
+            onSave={handleSave}
+          />
+        )}
       </div>
-
-      {/* 🔥 MODAL FORA DO CARD */}
-      {openForm && (
-        <ProfessionalForm
-          professional={editProfessional}
-          user={user}
-          onClose={() => setOpenForm(false)}
-          onSave={handleSave}
-        />
-      )}
-    </>
-  </DashboardLayout>
-);
+    </DashboardLayout>
+  );
 }
