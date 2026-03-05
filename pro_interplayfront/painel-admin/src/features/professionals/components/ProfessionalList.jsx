@@ -22,7 +22,7 @@ export default function ProfessionalsList({
           professional={prof}
           onEdit={() => onEdit(prof)}
           onDelete={() => onDelete(prof.id)}
-          user={user} // passa o usuário logado
+          user={user} // passa o usuário logado para controlar permissões
         />
       ))}
     </div>

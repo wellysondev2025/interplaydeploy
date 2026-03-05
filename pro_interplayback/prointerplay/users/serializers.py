@@ -49,15 +49,18 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         password = validated_data.pop("password")
 
-        # Regra centralizada
-        if request.user.is_superuser:
-            # SUPERUSER pode escolher qualquer role e organization
+        if request.user.role == User.Role.SUPERUSER:
+            # Superuser pode escolher role e organization
             role = validated_data.get("role", User.Role.PROFESSIONAL)
             organization = validated_data.get("organization")
+
             if role != User.Role.PROFESSIONAL and not organization:
-                raise serializers.ValidationError("Superuser deve definir organization para roles administrativas.")
+                raise serializers.ValidationError(
+                    "Superuser deve definir organization para roles administrativas."
+                )
+
         else:
-            # ORG_ADMIN só cria PROFESSIONAL dentro da própria organização
+            # Org Admin só cria Professional
             role = User.Role.PROFESSIONAL
             validated_data["organization"] = request.user.organization
 

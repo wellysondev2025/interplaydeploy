@@ -15,12 +15,15 @@ export default function Professionals() {
   const { user, loading: loadingUser } = useUser();
 
   useEffect(() => {
-    if (user) loadProfessionals();
+    if (user) {
+      loadProfessionals();
+    }
   }, [user]);
 
   async function loadProfessionals() {
     setLoadingProfessionals(true);
     setError(null);
+
     try {
       const res = await api.get("painel/professionals/");
       setProfessionals(res.data);
@@ -33,6 +36,11 @@ export default function Professionals() {
     }
   }
 
+  function handleCreate() {
+    setEditProfessional(null);
+    setOpenForm(true);
+  }
+
   function handleEdit(professional) {
     setEditProfessional(professional);
     setOpenForm(true);
@@ -40,6 +48,7 @@ export default function Professionals() {
 
   async function handleDelete(id) {
     if (!confirm("Deseja realmente excluir este profissional?")) return;
+
     try {
       await api.delete(`painel/professionals/${id}/`);
       loadProfessionals();
@@ -52,6 +61,12 @@ export default function Professionals() {
   function handleSave() {
     loadProfessionals();
     setOpenForm(false);
+    setEditProfessional(null);
+  }
+
+  function handleCancel() {
+    setOpenForm(false);
+    setEditProfessional(null);
   }
 
   if (loadingUser || loadingProfessionals) {
@@ -79,10 +94,11 @@ export default function Professionals() {
   return (
     <DashboardLayout title="Profissionais">
       <div className="relative">
+
         {/* Card principal */}
         <div className="bg-surface rounded-2xl shadow-lg p-5 sm:p-6 lg:p-8">
-          
-          {/* Header da página */}
+
+          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold">
@@ -95,19 +111,8 @@ export default function Professionals() {
 
             {canCreate && (
               <button
-                onClick={() => {
-                  setEditProfessional(null);
-                  setOpenForm(true);
-                }}
-                className="
-                  w-full
-                  sm:w-auto
-                  px-5
-                  py-2.5
-                  rounded-lg
-                  font-medium
-                  btn-primary
-                "
+                onClick={handleCreate}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg font-medium btn-primary"
               >
                 + Novo Profissional
               </button>
@@ -133,10 +138,11 @@ export default function Professionals() {
           <ProfessionalForm
             professional={editProfessional}
             user={user}
-            onClose={() => setOpenForm(false)}
+            onClose={handleCancel}
             onSave={handleSave}
           />
         )}
+
       </div>
     </DashboardLayout>
   );
